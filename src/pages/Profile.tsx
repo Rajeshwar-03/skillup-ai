@@ -8,10 +8,11 @@ import { Navigation } from "@/components/Navigation";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Book, Star, Trophy, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import type { Profile } from "@/types/database";
 
-const Profile = () => {
+const ProfilePage = () => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,15 +27,16 @@ const Profile = () => {
         return;
       }
 
-      const { data: profile } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      setProfile(profile);
-    } catch (error) {
-      toast.error("Error loading profile");
+      if (error) throw error;
+      setProfile(data);
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -158,4 +160,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfilePage;

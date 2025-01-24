@@ -1,15 +1,41 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, BarChart, BookOpen, Video, FileText, Map, ArrowLeft } from "lucide-react";
+import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
-const courseData = {
+type CourseType = {
+  title: string;
+  description: string;
+  duration: string;
+  lessons: number;
+  students: number;
+  rating: number;
+  instructor: string;
+  price: string;
+  features: string[];
+  materials: Array<{
+    title: string;
+    type: "video" | "document";
+    duration?: string;
+    size?: string;
+  }>;
+  reviews: Array<{
+    name: string;
+    rating: number;
+    comment: string;
+  }>;
+  liveSessionSchedule: Array<{
+    topic: string;
+    day: string;
+    time: string;
+  }>;
+};
+
+const courseData: Record<string, CourseType> = {
   "full-stack": {
     title: "Full Stack Development",
     description: "Master MERN stack and modern web development practices with hands-on projects and real-world applications. Learn from industry experts and build a professional portfolio.",
@@ -19,6 +45,24 @@ const courseData = {
     rating: 4.8,
     instructor: "Dr. Sarah Johnson",
     price: "Free",
+    features: [
+      "Comprehensive MERN Stack Coverage",
+      "Real-world Project Development",
+      "Industry Best Practices",
+      "Portfolio Building",
+    ],
+    materials: [
+      { title: "Introduction to Web Development", type: "video", duration: "45 min" },
+      { title: "React Fundamentals Guide", type: "document", size: "2.5 MB" },
+    ],
+    reviews: [
+      { name: "John Doe", rating: 5, comment: "Excellent course structure!" },
+      { name: "Jane Smith", rating: 4, comment: "Very practical approach" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Advanced React Patterns", day: "Monday", time: "10:00 AM" },
+      { topic: "Node.js Best Practices", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "ai-ml": {
     title: "AI & Machine Learning",
@@ -29,6 +73,24 @@ const courseData = {
     rating: 4.9,
     instructor: "Dr. Michael Chen",
     price: "Free",
+    features: [
+      "Deep Learning Fundamentals",
+      "Neural Network Architecture",
+      "Computer Vision Applications",
+      "Natural Language Processing",
+    ],
+    materials: [
+      { title: "Introduction to AI", type: "video", duration: "60 min" },
+      { title: "Machine Learning Basics", type: "document", size: "3.2 MB" },
+    ],
+    reviews: [
+      { name: "Alex Johnson", rating: 5, comment: "Comprehensive AI coverage!" },
+      { name: "Sarah Lee", rating: 5, comment: "Excellent practical examples" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Neural Networks Deep Dive", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Advanced ML Algorithms", day: "Thursday", time: "3:00 PM" },
+    ],
   },
   "cloud": {
     title: "Cloud Computing (AWS)",
@@ -39,6 +101,24 @@ const courseData = {
     rating: 4.7,
     instructor: "Dr. Emily Davis",
     price: "Free",
+    features: [
+      "AWS Fundamentals",
+      "Cloud Architecture Design",
+      "Hands-on Projects",
+      "Real-world Applications",
+    ],
+    materials: [
+      { title: "AWS Basics", type: "video", duration: "50 min" },
+      { title: "Cloud Architecture Guide", type: "document", size: "2.0 MB" },
+    ],
+    reviews: [
+      { name: "Michael Brown", rating: 5, comment: "Great course for beginners!" },
+      { name: "Emily White", rating: 4, comment: "Very informative" },
+    ],
+    liveSessionSchedule: [
+      { topic: "AWS Services Overview", day: "Friday", time: "1:00 PM" },
+      { topic: "Cloud Security Best Practices", day: "Saturday", time: "4:00 PM" },
+    ],
   },
   "devops": {
     title: "DevOps & CI/CD",
@@ -49,6 +129,24 @@ const courseData = {
     rating: 4.8,
     instructor: "Dr. Alex Smith",
     price: "Free",
+    features: [
+      "CI/CD Pipeline Setup",
+      "Containerization with Docker",
+      "Infrastructure as Code",
+      "Monitoring and Logging",
+    ],
+    materials: [
+      { title: "Introduction to DevOps", type: "video", duration: "30 min" },
+      { title: "CI/CD Best Practices", type: "document", size: "1.5 MB" },
+    ],
+    reviews: [
+      { name: "Chris Green", rating: 5, comment: "Very practical and hands-on!" },
+      { name: "Anna Taylor", rating: 4, comment: "Good insights into DevOps" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Docker Fundamentals", day: "Monday", time: "10:00 AM" },
+      { topic: "Kubernetes Basics", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "blockchain": {
     title: "Blockchain Development",
@@ -59,6 +157,24 @@ const courseData = {
     rating: 4.6,
     instructor: "Dr. Lisa White",
     price: "Free",
+    features: [
+      "Blockchain Fundamentals",
+      "Smart Contract Development",
+      "Decentralized Applications",
+      "Real-world Use Cases",
+    ],
+    materials: [
+      { title: "Blockchain Basics", type: "video", duration: "40 min" },
+      { title: "Smart Contracts Guide", type: "document", size: "2.8 MB" },
+    ],
+    reviews: [
+      { name: "David Black", rating: 5, comment: "Excellent course!" },
+      { name: "Sophia Blue", rating: 4, comment: "Very informative" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Ethereum Development", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Blockchain Security", day: "Thursday", time: "3:00 PM" },
+    ],
   },
   "ui-ux": {
     title: "UI/UX Design",
@@ -69,6 +185,24 @@ const courseData = {
     rating: 4.9,
     instructor: "Dr. John Brown",
     price: "Free",
+    features: [
+      "User Research Techniques",
+      "Wireframing and Prototyping",
+      "Visual Design Principles",
+      "Usability Testing",
+    ],
+    materials: [
+      { title: "UI/UX Basics", type: "video", duration: "35 min" },
+      { title: "Design Tools Overview", type: "document", size: "1.2 MB" },
+    ],
+    reviews: [
+      { name: "Emma Wilson", rating: 5, comment: "Great insights into design!" },
+      { name: "Liam Johnson", rating: 4, comment: "Very practical" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Design Thinking Workshop", day: "Monday", time: "10:00 AM" },
+      { topic: "Prototyping with Figma", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "data-science": {
     title: "Data Science",
@@ -79,6 +213,24 @@ const courseData = {
     rating: 4.8,
     instructor: "Dr. Sarah Lee",
     price: "Free",
+    features: [
+      "Data Analysis with Python",
+      "Data Visualization Techniques",
+      "Machine Learning Basics",
+      "Real-world Projects",
+    ],
+    materials: [
+      { title: "Data Science Basics", type: "video", duration: "50 min" },
+      { title: "Data Visualization Guide", type: "document", size: "2.0 MB" },
+    ],
+    reviews: [
+      { name: "Oliver Brown", rating: 5, comment: "Very comprehensive!" },
+      { name: "Ava Davis", rating: 4, comment: "Good practical examples" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Data Analysis with Pandas", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Machine Learning with Scikit-learn", day: "Thursday", time: "3:00 PM" },
+    ],
   },
   "cybersecurity": {
     title: "Cybersecurity",
@@ -89,6 +241,24 @@ const courseData = {
     rating: 4.7,
     instructor: "Dr. Kevin Green",
     price: "Free",
+    features: [
+      "Network Security Fundamentals",
+      "Ethical Hacking Techniques",
+      "Incident Response",
+      "Real-world Case Studies",
+    ],
+    materials: [
+      { title: "Cybersecurity Basics", type: "video", duration: "45 min" },
+      { title: "Ethical Hacking Guide", type: "document", size: "2.5 MB" },
+    ],
+    reviews: [
+      { name: "Mia White", rating: 5, comment: "Very informative!" },
+      { name: "James Black", rating: 4, comment: "Good insights" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Network Security Best Practices", day: "Monday", time: "10:00 AM" },
+      { topic: "Ethical Hacking Workshop", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "mobile-dev": {
     title: "Mobile App Development",
@@ -99,6 +269,24 @@ const courseData = {
     rating: 4.8,
     instructor: "Dr. Rachel Adams",
     price: "Free",
+    features: [
+      "React Native Fundamentals",
+      "Mobile UI Design",
+      "APIs and Backend Integration",
+      "Real-world Projects",
+    ],
+    materials: [
+      { title: "Mobile Development Basics", type: "video", duration: "50 min" },
+      { title: "React Native Guide", type: "document", size: "2.0 MB" },
+    ],
+    reviews: [
+      { name: "Lucas Green", rating: 5, comment: "Excellent course!" },
+      { name: "Sophia Taylor", rating: 4, comment: "Very practical" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Building Your First App", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Advanced React Native Techniques", day: "Thursday", time: "3:00 PM" },
+    ],
   },
   "python": {
     title: "Python Programming",
@@ -109,6 +297,24 @@ const courseData = {
     rating: 4.9,
     instructor: "Dr. Mark Wilson",
     price: "Free",
+    features: [
+      "Python Basics",
+      "Data Structures and Algorithms",
+      "Web Development with Flask",
+      "Real-world Projects",
+    ],
+    materials: [
+      { title: "Python Basics", type: "video", duration: "30 min" },
+      { title: "Flask Web Development Guide", type: "document", size: "1.5 MB" },
+    ],
+    reviews: [
+      { name: "Ella Johnson", rating: 5, comment: "Great course!" },
+      { name: "Liam Brown", rating: 4, comment: "Very informative" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Python for Data Analysis", day: "Monday", time: "10:00 AM" },
+      { topic: "Web Development with Flask", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "digital-marketing": {
     title: "Digital Marketing",
@@ -119,6 +325,24 @@ const courseData = {
     rating: 4.7,
     instructor: "Dr. Anna Taylor",
     price: "Free",
+    features: [
+      "SEO Fundamentals",
+      "Social Media Strategies",
+      "Content Marketing",
+      "Real-world Case Studies",
+    ],
+    materials: [
+      { title: "Digital Marketing Basics", type: "video", duration: "40 min" },
+      { title: "SEO Guide", type: "document", size: "2.0 MB" },
+    ],
+    reviews: [
+      { name: "Oliver White", rating: 5, comment: "Very practical!" },
+      { name: "Ava Green", rating: 4, comment: "Good insights" },
+    ],
+    liveSessionSchedule: [
+      { topic: "SEO Best Practices", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Social Media Marketing Strategies", day: "Thursday", time: "3:00 PM" },
+    ],
   },
   "iot": {
     title: "IoT Development",
@@ -129,6 +353,24 @@ const courseData = {
     rating: 4.6,
     instructor: "Dr. Chris Martinez",
     price: "Free",
+    features: [
+      "IoT Fundamentals",
+      "Device Communication Protocols",
+      "Cloud Integration",
+      "Real-world Projects",
+    ],
+    materials: [
+      { title: "IoT Basics", type: "video", duration: "50 min" },
+      { title: "Cloud Integration Guide", type: "document", size: "2.5 MB" },
+    ],
+    reviews: [
+      { name: "Mason Brown", rating: 5, comment: "Excellent course!" },
+      { name: "Isabella Davis", rating: 4, comment: "Very informative" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Building IoT Solutions", day: "Monday", time: "10:00 AM" },
+      { topic: "IoT Security Best Practices", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "game-dev": {
     title: "Game Development",
@@ -139,6 +381,24 @@ const courseData = {
     rating: 4.8,
     instructor: "Dr. Jessica Thompson",
     price: "Free",
+    features: [
+      "Game Design Principles",
+      "Unity Fundamentals",
+      "C# Programming",
+      "Real-world Projects",
+    ],
+    materials: [
+      { title: "Game Development Basics", type: "video", duration: "60 min" },
+      { title: "Unity Guide", type: "document", size: "3.0 MB" },
+    ],
+    reviews: [
+      { name: "Ethan Wilson", rating: 5, comment: "Great course!" },
+      { name: "Mia Johnson", rating: 4, comment: "Very practical" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Creating Your First Game", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Advanced Unity Techniques", day: "Thursday", time: "3:00 PM" },
+    ],
   },
   "cloud-native": {
     title: "Cloud Native Development",
@@ -149,6 +409,24 @@ const courseData = {
     rating: 4.7,
     instructor: "Dr. Brian Harris",
     price: "Free",
+    features: [
+      "Kubernetes Fundamentals",
+      "Microservices Architecture",
+      "Real-world Projects",
+      "Cloud Deployment",
+    ],
+    materials: [
+      { title: "Cloud Native Basics", type: "video", duration: "50 min" },
+      { title: "Kubernetes Guide", type: "document", size: "2.5 MB" },
+    ],
+    reviews: [
+      { name: "Aiden Brown", rating: 5, comment: "Excellent course!" },
+      { name: "Charlotte Green", rating: 4, comment: "Very informative" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Kubernetes for Beginners", day: "Monday", time: "10:00 AM" },
+      { topic: "Microservices Best Practices", day: "Wednesday", time: "2:00 PM" },
+    ],
   },
   "data-engineering": {
     title: "Data Engineering",
@@ -159,6 +437,24 @@ const courseData = {
     rating: 4.8,
     instructor: "Dr. Emily Clark",
     price: "Free",
+    features: [
+      "Data Pipeline Fundamentals",
+      "ETL Processes",
+      "Data Warehousing",
+      "Real-world Projects",
+    ],
+    materials: [
+      { title: "Data Engineering Basics", type: "video", duration: "60 min" },
+      { title: "ETL Guide", type: "document", size: "3.0 MB" },
+    ],
+    reviews: [
+      { name: "James Wilson", rating: 5, comment: "Great course!" },
+      { name: "Olivia Johnson", rating: 4, comment: "Very practical" },
+    ],
+    liveSessionSchedule: [
+      { topic: "Building Data Pipelines", day: "Tuesday", time: "11:00 AM" },
+      { topic: "Data Warehousing Best Practices", day: "Thursday", time: "3:00 PM" },
+    ],
   }
 };
 
@@ -370,8 +666,8 @@ const CourseDetails = () => {
                 </Button>
 
                 <Button variant="outline" className="w-full" size="lg">
-                  <Map className="mr-2" />
-                  View Roadmap
+                  <MessageSquare className="mr-2" />
+                  Chat with AI Assistant
                 </Button>
               </div>
 
@@ -386,13 +682,6 @@ const CourseDetails = () => {
                     <div className="text-sm text-muted-foreground">Senior Developer & Educator</div>
                   </div>
                 </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-white/20">
-                <Button variant="outline" className="w-full" size="lg">
-                  <MessageSquare className="mr-2" />
-                  Chat with AI Assistant
-                </Button>
               </div>
             </div>
           </motion.div>
