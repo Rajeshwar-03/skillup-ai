@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, BarChart, BookOpen, Video, FileText, RoadMap } from "lucide-react";
+import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, BarChart, BookOpen, Video, FileText, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
@@ -237,7 +237,7 @@ const CourseDetails = () => {
                 </Button>
 
                 <Button variant="outline" className="w-full" size="lg">
-                  <RoadMap className="mr-2" />
+                  <Map className="mr-2" />
                   View Roadmap
                 </Button>
               </div>
