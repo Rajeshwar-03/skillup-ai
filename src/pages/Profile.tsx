@@ -8,7 +8,9 @@ import { Navigation } from "@/components/Navigation";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Book, Star, Trophy, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import type { Profile } from "@/types/database";
+import type { Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const ProfilePage = () => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select()
         .eq('id', user.id)
         .single();
 
@@ -99,7 +101,7 @@ const ProfilePage = () => {
                 <div>
                   <h4 className="font-semibold mb-2">Strengths</h4>
                   <ul className="list-disc list-inside">
-                    {profile?.strengths?.map((strength: string, index: number) => (
+                    {profile?.strengths?.map((strength, index) => (
                       <li key={index}>{strength}</li>
                     )) || <li>No strengths recorded yet</li>}
                   </ul>
@@ -107,7 +109,7 @@ const ProfilePage = () => {
                 <div>
                   <h4 className="font-semibold mb-2">Areas for Improvement</h4>
                   <ul className="list-disc list-inside">
-                    {profile?.weaknesses?.map((weakness: string, index: number) => (
+                    {profile?.weaknesses?.map((weakness, index) => (
                       <li key={index}>{weakness}</li>
                     )) || <li>No areas recorded yet</li>}
                   </ul>
