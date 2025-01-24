@@ -11,6 +11,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -18,30 +19,61 @@ const Auth = () => {
     password: "",
   });
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          },
-        },
-      });
-
-      if (error) throw error;
-
-      if (data) {
-        toast({
-          title: "Success!",
-          description: "Account created successfully. Please check your email to verify your account.",
+      if (isLogin) {
+        // Handle login
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
         });
-        navigate("/");
+
+        if (error) throw error;
+
+        if (data) {
+          toast({
+            title: "Success!",
+            description: "Logged in successfully.",
+          });
+          navigate("/");
+        }
+      } else {
+        // Handle signup
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+            },
+          },
+        });
+
+        if (error) {
+          if (error.message === "User already registered") {
+            toast({
+              variant: "destructive",
+              title: "Account exists",
+              description: "This email is already registered. Please log in instead.",
+            });
+            setIsLogin(true);
+          } else {
+            throw error;
+          }
+          return;
+        }
+
+        if (data) {
+          toast({
+            title: "Success!",
+            description: "Account created successfully. Please check your email to verify your account.",
+          });
+          navigate("/");
+        }
       }
     } catch (error: any) {
       toast({
@@ -63,44 +95,46 @@ const Auth = () => {
       >
         <div className="glass rounded-2xl p-8">
           <h2 className="text-3xl font-bold text-center mb-8 gradient-text">
-            Join SkillUp AI
+            {isLogin ? "Welcome Back" : "Join SkillUp AI"}
           </h2>
-          <form onSubmit={handleSignUp} className="space-y-6">
+          <form onSubmit={handleAuth} className="space-y-6">
             <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label htmlFor="firstName" className="text-sm font-medium mb-1 block">
-                    First Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="firstName"
-                      placeholder="John"
-                      className="pl-10"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      required
-                    />
+              {!isLogin && (
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label htmlFor="firstName" className="text-sm font-medium mb-1 block">
+                      First Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                      <Input
+                        id="firstName"
+                        placeholder="John"
+                        className="pl-10"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        required={!isLogin}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <label htmlFor="lastName" className="text-sm font-medium mb-1 block">
+                      Last Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                      <Input
+                        id="lastName"
+                        placeholder="Doe"
+                        className="pl-10"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        required={!isLogin}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <label htmlFor="lastName" className="text-sm font-medium mb-1 block">
-                    Last Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="lastName"
-                      placeholder="Doe"
-                      className="pl-10"
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
+              )}
               <div>
                 <label htmlFor="email" className="text-sm font-medium mb-1 block">
                   Email
@@ -141,20 +175,21 @@ const Auth = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
+                  {isLogin ? "Logging in..." : "Creating account..."}
                 </>
               ) : (
-                "Sign Up"
+                isLogin ? "Log In" : "Sign Up"
               )}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              {isLogin ? "Don't have an account? " : "Already have an account? "}
               <Button
                 variant="link"
                 className="p-0 h-auto font-semibold"
-                onClick={() => navigate("/login")}
+                onClick={() => setIsLogin(!isLogin)}
+                type="button"
               >
-                Log in
+                {isLogin ? "Sign up" : "Log in"}
               </Button>
             </p>
           </form>
