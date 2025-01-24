@@ -1,12 +1,15 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download } from "lucide-react";
+import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, BarChart, BookOpen, Video, FileText, RoadMap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const CourseDetails = () => {
   const { courseId } = useParams();
+  const [selectedTab, setSelectedTab] = useState("overview");
 
   // This would typically come from an API
   const courseDetails = {
@@ -17,7 +20,7 @@ const CourseDetails = () => {
     students: 2500,
     rating: 4.8,
     instructor: "Dr. Sarah Johnson",
-    price: "$499",
+    price: "Free",
     features: [
       "24/7 AI Learning Assistant",
       "Live Virtual Classes",
@@ -25,7 +28,36 @@ const CourseDetails = () => {
       "Career Support",
       "Certificate",
       "Community Access"
+    ],
+    materials: [
+      { title: "Introduction to Web Development", type: "video", duration: "45 min" },
+      { title: "HTML & CSS Basics", type: "document", size: "2.3 MB" },
+      { title: "JavaScript Fundamentals", type: "video", duration: "1.5 hours" },
+    ],
+    reviews: [
+      { name: "John D.", rating: 5, comment: "Excellent course structure and content!" },
+      { name: "Sarah M.", rating: 4.5, comment: "Very practical and hands-on learning experience." },
+    ],
+    weeklyTasks: [
+      { week: 1, task: "Build a responsive landing page", deadline: "Friday" },
+      { week: 1, task: "Complete HTML assessment", deadline: "Sunday" },
+    ],
+    liveSessionSchedule: [
+      { day: "Monday", time: "10:00 AM", topic: "Frontend Development" },
+      { day: "Wednesday", time: "2:00 PM", topic: "Backend Development" },
     ]
+  };
+
+  const handleEnroll = () => {
+    toast.success("Successfully enrolled! Check your email for next steps.");
+  };
+
+  const handleDownload = () => {
+    toast.success("Materials downloading...");
+  };
+
+  const handleWatchDemo = () => {
+    toast.success("Loading demo video...");
   };
 
   return (
@@ -61,20 +93,126 @@ const CourseDetails = () => {
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-6 mb-8">
-              <h2 className="text-2xl font-semibold mb-4">About This Course</h2>
-              <p className="text-muted-foreground">{courseDetails.description}</p>
+            {/* Tabs Navigation */}
+            <div className="flex space-x-4 mb-6 border-b">
+              {["overview", "materials", "reviews", "schedule"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setSelectedTab(tab)}
+                  className={`py-2 px-4 ${
+                    selectedTab === tab
+                      ? "border-b-2 border-primary text-primary"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              {courseDetails.features.map((feature, index) => (
-                <Card key={index} className="glass border-none">
-                  <CardContent className="flex items-center gap-3 p-4">
-                    <Trophy className="w-5 h-5 text-primary" />
-                    <span>{feature}</span>
-                  </CardContent>
-                </Card>
-              ))}
+            {/* Tab Content */}
+            <div className="space-y-6">
+              {selectedTab === "overview" && (
+                <div className="glass rounded-2xl p-6">
+                  <h2 className="text-2xl font-semibold mb-4">About This Course</h2>
+                  <p className="text-muted-foreground mb-6">{courseDetails.description}</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {courseDetails.features.map((feature, index) => (
+                      <Card key={index} className="glass border-none">
+                        <CardContent className="flex items-center gap-3 p-4">
+                          <CheckCircle className="w-5 h-5 text-primary" />
+                          <span>{feature}</span>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedTab === "materials" && (
+                <div className="glass rounded-2xl p-6">
+                  <h2 className="text-2xl font-semibold mb-4">Course Materials</h2>
+                  <div className="space-y-4">
+                    {courseDetails.materials.map((material, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 glass rounded-xl">
+                        <div className="flex items-center gap-3">
+                          {material.type === "video" ? (
+                            <Video className="w-5 h-5 text-primary" />
+                          ) : (
+                            <FileText className="w-5 h-5 text-primary" />
+                          )}
+                          <div>
+                            <p className="font-medium">{material.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {material.duration || material.size}
+                            </p>
+                          </div>
+                        </div>
+                        <Button onClick={handleDownload} variant="outline" size="sm">
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedTab === "reviews" && (
+                <div className="glass rounded-2xl p-6">
+                  <h2 className="text-2xl font-semibold mb-4">Student Reviews</h2>
+                  <div className="space-y-4">
+                    {courseDetails.reviews.map((review, index) => (
+                      <div key={index} className="glass rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            {review.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="font-medium">{review.name}</p>
+                            <div className="flex items-center">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-4 h-4 ${
+                                    i < review.rating
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-muted-foreground">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedTab === "schedule" && (
+                <div className="glass rounded-2xl p-6">
+                  <h2 className="text-2xl font-semibold mb-4">Live Sessions Schedule</h2>
+                  <div className="space-y-4">
+                    {courseDetails.liveSessionSchedule.map((session, index) => (
+                      <div key={index} className="glass rounded-xl p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Calendar className="w-5 h-5 text-primary" />
+                          <div>
+                            <p className="font-medium">{session.topic}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {session.day} at {session.time}
+                            </p>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm">Join Session</Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -85,17 +223,22 @@ const CourseDetails = () => {
             className="lg:col-span-1"
           >
             <div className="glass rounded-2xl p-6 sticky top-24">
-              <div className="text-3xl font-bold mb-6 text-center">{courseDetails.price}</div>
+              <div className="text-3xl font-bold mb-6 text-center text-primary">{courseDetails.price}</div>
               
               <div className="space-y-4">
-                <Button className="w-full" size="lg">
+                <Button className="w-full" size="lg" onClick={handleEnroll}>
                   <PlayCircle className="mr-2" />
-                  Start Learning
+                  Enroll Now
                 </Button>
                 
+                <Button variant="outline" className="w-full" size="lg" onClick={handleWatchDemo}>
+                  <Video className="mr-2" />
+                  Watch Demo
+                </Button>
+
                 <Button variant="outline" className="w-full" size="lg">
-                  <Download className="mr-2" />
-                  Download Syllabus
+                  <RoadMap className="mr-2" />
+                  View Roadmap
                 </Button>
               </div>
 

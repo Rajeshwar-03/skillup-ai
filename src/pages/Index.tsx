@@ -4,6 +4,7 @@ import { Features } from "@/components/Features";
 import { Courses } from "@/components/Courses";
 import { Community } from "@/components/Community";
 import { AIChat } from "@/components/AIChat";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
       <Courses />
       <Community />
       <AIChat />
+      <Footer />
     </main>
   );
 };
