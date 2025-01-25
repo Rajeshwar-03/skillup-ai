@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/bfe857ad-6777-45fa-b854-f14474e0c7c8
+**URL**: https://skillup-ai.lovable.app/
 
 ## How can I edit this code?
 
