@@ -30,14 +30,37 @@ const ProfilePage = () => {
         return;
       }
 
+      // Use maybeSingle() instead of single() to handle no results gracefully
       const { data, error } = await supabase
         .from('profiles')
         .select()
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setProfile(data);
+      
+      if (!data) {
+        // If no profile exists, create one
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({ id: user.id })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        
+        // Fetch the newly created profile
+        const { data: newProfile, error: fetchError } = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', user.id)
+          .single();
+
+        if (fetchError) throw fetchError;
+        setProfile(newProfile);
+      } else {
+        setProfile(data);
+      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -91,7 +114,9 @@ const ProfilePage = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>;
   }
 
   return (
@@ -239,6 +264,7 @@ const ProfilePage = () => {
       </main>
     </div>
   );
+
 };
 
 export default ProfilePage;

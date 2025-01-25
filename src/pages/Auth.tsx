@@ -25,7 +25,6 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Handle login
         const { data, error } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
@@ -41,7 +40,6 @@ const Auth = () => {
           navigate("/");
         }
       } else {
-        // Handle signup
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
