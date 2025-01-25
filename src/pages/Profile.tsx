@@ -50,6 +50,7 @@ const ProfilePage = () => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       navigate('/signup');
+      toast.success('Logged out successfully');
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -80,7 +81,7 @@ const ProfilePage = () => {
 
       if (updateError) throw updateError;
 
-      toast.success('Avatar updated successfully!');
+      toast.success('Profile picture updated successfully!');
       fetchProfile();
     } catch (error: any) {
       toast.error(error.message);
@@ -170,7 +171,6 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
 
-          {/* Strengths & Weaknesses */}
           <Card className="glass">
             <CardHeader>
               <CardTitle>Skills Analysis</CardTitle>
