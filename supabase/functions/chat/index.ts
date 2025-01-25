@@ -37,6 +37,21 @@ serve(async (req) => {
     if (!response.ok) {
       const errorData = await response.text();
       console.error('OpenAI API error:', errorData);
+      
+      // Check if it's a quota error
+      if (errorData.includes('insufficient_quota')) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'OpenAI API quota exceeded. Please check your API key billing status.',
+            details: errorData 
+          }),
+          { 
+            status: 402,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+      
       throw new Error(`OpenAI API error: ${errorData}`);
     }
 
@@ -49,21 +64,6 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in chat function:', error);
-    
-    // Check if it's a quota error
-    if (error.message.includes('insufficient_quota')) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'OpenAI API quota exceeded. Please check your API key billing status.',
-          details: error.message 
-        }),
-        { 
-          status: 402, // Payment Required
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-    
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
