@@ -21,7 +21,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
@@ -29,11 +29,15 @@ serve(async (req) => {
           },
           ...messages
         ],
+        temperature: 0.7,
+        max_tokens: 500
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${await response.text()}`);
+      const errorData = await response.text();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData}`);
     }
 
     const data = await response.json();
@@ -45,6 +49,21 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in chat function:', error);
+    
+    // Check if it's a quota error
+    if (error.message.includes('insufficient_quota')) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'OpenAI API quota exceeded. Please check your API key billing status.',
+          details: error.message 
+        }),
+        { 
+          status: 402, // Payment Required
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
