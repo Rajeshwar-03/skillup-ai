@@ -10,7 +10,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bfe857ad-6777-45fa-b854-f14474e0c7c8) and start prompting.
+Simply visit the [Lovable Project](https://skillup-ai.lovable.app/) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
