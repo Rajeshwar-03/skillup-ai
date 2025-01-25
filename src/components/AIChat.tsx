@@ -17,6 +17,7 @@ export const AIChat = () => {
   ]);
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -103,25 +104,34 @@ export const AIChat = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || isLoading) return;
 
     const userMessage = { role: "user" as const, content: message };
     setMessages(prev => [...prev, userMessage]);
     setMessage("");
+    setIsLoading(true);
 
     try {
-      // Simulate AI response for now - replace with actual AI integration
+      const { data, error } = await supabase.functions.invoke("chat", {
+        body: { 
+          messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content }))
+        }
+      });
+
+      if (error) throw error;
+
       const aiResponse = { 
         role: "assistant" as const, 
-        content: "I understand your message. This is a placeholder response that would normally come from an AI model. How else can I help you?" 
+        content: data.message || "I apologize, but I couldn't generate a response. Please try again."
       };
-      setMessages(prev => [...prev, aiResponse]);
       
-      // Automatically speak the response
+      setMessages(prev => [...prev, aiResponse]);
       await speakText(aiResponse.content);
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -175,6 +185,7 @@ export const AIChat = () => {
                   size="icon"
                   className={isRecording ? "bg-red-500 hover:bg-red-600" : ""}
                   onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isLoading}
                 >
                   <Mic className="w-4 h-4" />
                 </Button>
@@ -186,6 +197,7 @@ export const AIChat = () => {
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
                   className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled={isLoading}
                 />
                 
                 <Button
@@ -193,7 +205,7 @@ export const AIChat = () => {
                   size="icon"
                   className={isSpeaking ? "animate-pulse" : ""}
                   onClick={() => messages.length > 0 && speakText(messages[messages.length - 1].content)}
-                  disabled={isSpeaking || messages.length === 0}
+                  disabled={isSpeaking || messages.length === 0 || isLoading}
                 >
                   <Speaker className="w-4 h-4" />
                 </Button>
@@ -202,7 +214,7 @@ export const AIChat = () => {
                   variant="default"
                   size="icon"
                   onClick={handleSendMessage}
-                  disabled={!message.trim()}
+                  disabled={!message.trim() || isLoading}
                 >
                   <Send className="w-4 h-4" />
                 </Button>
