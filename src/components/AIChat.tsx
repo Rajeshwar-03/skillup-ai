@@ -13,7 +13,10 @@ interface ChatMessage {
 export const AIChat = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: "Hello! How can I help you with your learning journey today?" }
+    { 
+      role: "assistant", 
+      content: "Hello! I'm here to assist you with your learning journey. Feel free to speak or type in any language you're comfortable with. You can click the microphone button to start speaking, and I'll convert your voice to text. How can I help you today?" 
+    }
   ]);
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -44,6 +47,7 @@ export const AIChat = () => {
           const base64Audio = reader.result?.toString().split(",")[1];
           if (base64Audio) {
             try {
+              toast.info("Converting your speech to text...");
               const { data, error } = await supabase.functions.invoke("speech-to-text", {
                 body: { audio: base64Audio }
               });
@@ -51,6 +55,7 @@ export const AIChat = () => {
               if (error) throw error;
               if (data.text) {
                 setMessage(data.text);
+                toast.success("Speech converted successfully!");
               }
             } catch (error) {
               console.error("Speech to text error:", error);
@@ -62,7 +67,7 @@ export const AIChat = () => {
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
-      toast.info("Recording started...");
+      toast.info("Listening... Click the microphone again to stop recording.");
     } catch (error) {
       console.error("Error accessing microphone:", error);
       toast.error("Could not access microphone. Please check permissions.");
@@ -153,7 +158,7 @@ export const AIChat = () => {
         >
           <h2 className="text-4xl font-bold mb-4 gradient-text">AI Learning Assistant</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Get instant help with your learning journey through our AI-powered chatbot
+            Speak or type in any language - I'm here to help with your learning journey
           </p>
         </motion.div>
 
@@ -183,11 +188,11 @@ export const AIChat = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  className={isRecording ? "bg-red-500 hover:bg-red-600" : ""}
+                  className={`${isRecording ? "bg-red-500 hover:bg-red-600" : ""} transition-colors duration-200`}
                   onClick={isRecording ? stopRecording : startRecording}
                   disabled={isLoading}
                 >
-                  <Mic className="w-4 h-4" />
+                  <Mic className={`w-4 h-4 ${isRecording ? "animate-pulse" : ""}`} />
                 </Button>
                 
                 <input
@@ -195,7 +200,7 @@ export const AIChat = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
+                  placeholder="Type or speak your message in any language..."
                   className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   disabled={isLoading}
                 />
