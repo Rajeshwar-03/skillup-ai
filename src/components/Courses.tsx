@@ -13,7 +13,7 @@ const courses = [
     students: 2500,
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
     path: "full-stack",
-    demoVideo: "https://www.youtube.com/embed/nu_pCVPKzTk"
+    demoVideo: "https://www.youtube.com/embed/bMknfKXIFA8" // Complete React course intro
   },
   {
     title: "AI & Machine Learning",
@@ -23,7 +23,7 @@ const courses = [
     students: 1800,
     image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c",
     path: "ai-ml",
-    demoVideo: "https://www.youtube.com/embed/JMUxmLyrhSk"
+    demoVideo: "https://www.youtube.com/embed/i_LwzRVP7bg" // ML course intro
   },
   {
     title: "Cloud Computing (AWS)",
@@ -33,7 +33,7 @@ const courses = [
     students: 2100,
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
     path: "aws",
-    demoVideo: "https://www.youtube.com/embed/3hLmDS179YE"
+    demoVideo: "https://www.youtube.com/embed/k1RI5locZE4" // AWS course intro
   },
   {
     title: "DevOps & CI/CD",
@@ -43,7 +43,7 @@ const courses = [
     students: 1500,
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
     path: "devops",
-    demoVideo: "https://www.youtube.com/embed/Xrgk023l4lI"
+    demoVideo: "https://www.youtube.com/embed/j5Zsa_eOXeY" // DevOps course intro
   },
   {
     title: "Blockchain Development",
@@ -53,7 +53,7 @@ const courses = [
     students: 1200,
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0",
     path: "blockchain",
-    demoVideo: "https://www.youtube.com/embed/gyMwXuJrbJQ"
+    demoVideo: "https://www.youtube.com/embed/gyMwXuJrbJQ" // Blockchain course intro
   },
   {
     title: "UI/UX Design",
@@ -63,7 +63,7 @@ const courses = [
     students: 3000,
     image: "https://images.unsplash.com/photo-1561070791-2526d30994b5",
     path: "ui-ux",
-    demoVideo: "https://www.youtube.com/embed/c9Wg6Cb_YlU"
+    demoVideo: "https://www.youtube.com/embed/c9Wg6Cb_YlU" // UI/UX course intro
   },
   {
     title: "Data Science",
@@ -73,7 +73,7 @@ const courses = [
     students: 2200,
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
     path: "data-science",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/ua-CiDNNj30" // Data Science course intro
   },
   {
     title: "Cybersecurity",
@@ -83,7 +83,7 @@ const courses = [
     students: 1600,
     image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b",
     path: "cybersecurity",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/BsxdJTKRqNk" // Cybersecurity course intro
   },
   {
     title: "Mobile App Development",
@@ -93,7 +93,7 @@ const courses = [
     students: 2800,
     image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c",
     path: "mobile-dev",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/0-S5a0eXPoc" // React Native course intro
   },
   {
     title: "Python Programming",
@@ -103,7 +103,7 @@ const courses = [
     students: 3500,
     image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935",
     path: "python",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/rfscVS0vtbw" // Python course intro
   },
   {
     title: "Digital Marketing",
@@ -113,7 +113,7 @@ const courses = [
     students: 2600,
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
     path: "digital-marketing",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/uqJR-U1fTn8" // Digital Marketing course intro
   },
   {
     title: "IoT Development",
@@ -123,7 +123,7 @@ const courses = [
     students: 1100,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
     path: "iot",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/h0gWfVCSGQQ" // IoT course intro
   },
   {
     title: "Game Development",
@@ -133,7 +133,7 @@ const courses = [
     students: 1900,
     image: "https://images.unsplash.com/photo-1556438064-2d7646166914",
     path: "game-dev",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/gB1F9G0JXOo" // Unity course intro
   },
   {
     title: "Cloud Native Development",
@@ -143,7 +143,7 @@ const courses = [
     students: 1400,
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
     path: "cloud-native",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/d6WC5n9G_sM" // Kubernetes course intro
   },
   {
     title: "Data Engineering",
@@ -153,7 +153,7 @@ const courses = [
     students: 1300,
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
     path: "data-engineering",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/qWru-b6m030" // Data Engineering course intro
   }
 ];
 
