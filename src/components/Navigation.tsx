@@ -1,14 +1,51 @@
 import { motion } from "framer-motion";
 import { Menu, X, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check initial auth state
+    checkUser();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        navigate('/signup');
+      }
+    });
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const checkUser = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      
+      if (!session) {
+        navigate('/signup');
+      }
+    } catch (error: any) {
+      console.error('Error checking auth state:', error);
+      toast.error('Authentication error. Please try logging in again.');
+      navigate('/signup');
+    }
+  };
 
   return (
     <motion.nav
@@ -29,18 +66,27 @@ export const Navigation = () => {
           </motion.a>
           
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full"
-              onClick={() => navigate('/profile')}
-            >
-              <Avatar>
-                <AvatarFallback>
-                  <User className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-            </Button>
+            {isAuthenticated ? (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full"
+                onClick={() => navigate('/profile')}
+              >
+                <Avatar>
+                  <AvatarFallback>
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/signup')}
+              >
+                Sign In
+              </Button>
+            )}
             
             <button 
               className="md:hidden"
@@ -62,14 +108,16 @@ export const Navigation = () => {
                 {item}
               </motion.a>
             ))}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90"
-              onClick={() => navigate('/signup')}
-            >
-              Sign Up
-            </motion.button>
+            {!isAuthenticated && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90"
+                onClick={() => navigate('/signup')}
+              >
+                Sign Up
+              </motion.button>
+            )}
           </div>
         </div>
       </div>
