@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Book, Star, Trophy, Calendar, LogOut, Upload } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { CourseRecommendations } from "@/components/CourseRecommendations";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -30,7 +31,6 @@ const ProfilePage = () => {
         return;
       }
 
-      // Use maybeSingle() instead of single() to handle no results gracefully
       const { data, error } = await supabase
         .from('profiles')
         .select()
@@ -40,7 +40,6 @@ const ProfilePage = () => {
       if (error) throw error;
       
       if (!data) {
-        // If no profile exists, create one
         const { error: insertError } = await supabase
           .from('profiles')
           .insert({ id: user.id })
@@ -49,7 +48,6 @@ const ProfilePage = () => {
 
         if (insertError) throw insertError;
         
-        // Fetch the newly created profile
         const { data: newProfile, error: fetchError } = await supabase
           .from('profiles')
           .select()
@@ -134,7 +132,6 @@ const ProfilePage = () => {
 
       <main className="container mx-auto px-4 pt-24">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Overview */}
           <Card className="lg:col-span-3 glass">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Profile Overview</CardTitle>
@@ -222,14 +219,12 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
 
-          {/* Daily Tasks */}
           <Card className="glass">
             <CardHeader>
               <CardTitle>Daily Tasks</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Add daily tasks here */}
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold">Complete React Tutorial</h4>
@@ -242,22 +237,15 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
 
-          {/* Recommendations */}
           <Card className="glass">
             <CardHeader>
               <CardTitle>Recommended for You</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Add recommendations here */}
-                <div className="flex items-center gap-4 p-4 border rounded-lg">
-                  <Book className="text-primary" />
-                  <div>
-                    <h4 className="font-semibold">Advanced JavaScript Concepts</h4>
-                    <p className="text-sm text-muted-foreground">Based on your progress</p>
-                  </div>
-                </div>
-              </div>
+              <CourseRecommendations 
+                strengths={profile?.strengths || []}
+                weaknesses={profile?.weaknesses || []}
+              />
             </CardContent>
           </Card>
         </div>
@@ -268,3 +256,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+

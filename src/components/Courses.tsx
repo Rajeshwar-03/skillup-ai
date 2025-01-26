@@ -13,7 +13,7 @@ const courses = [
     students: 2500,
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
     path: "full-stack",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/nu_pCVPKzTk"
   },
   {
     title: "AI & Machine Learning",
@@ -23,7 +23,7 @@ const courses = [
     students: 1800,
     image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c",
     path: "ai-ml",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/JMUxmLyrhSk"
   },
   {
     title: "Cloud Computing (AWS)",
@@ -33,7 +33,7 @@ const courses = [
     students: 2100,
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
     path: "aws",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/3hLmDS179YE"
   },
   {
     title: "DevOps & CI/CD",
@@ -43,7 +43,7 @@ const courses = [
     students: 1500,
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
     path: "devops",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/Xrgk023l4lI"
   },
   {
     title: "Blockchain Development",
@@ -53,7 +53,7 @@ const courses = [
     students: 1200,
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0",
     path: "blockchain",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/gyMwXuJrbJQ"
   },
   {
     title: "UI/UX Design",
@@ -63,7 +63,7 @@ const courses = [
     students: 3000,
     image: "https://images.unsplash.com/photo-1561070791-2526d30994b5",
     path: "ui-ux",
-    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    demoVideo: "https://www.youtube.com/embed/c9Wg6Cb_YlU"
   },
   {
     title: "Data Science",
