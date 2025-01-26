@@ -159,19 +159,27 @@ const courses = [
 
 export const Courses = () => {
   const handleWatchDemo = async (course: typeof courses[0]) => {
-    window.open(course.demoVideo, '_blank');
-    
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in to watch demo videos");
+        return;
+      }
+
       const { error } = await supabase
         .from('course_enrollments')
         .insert([
           { 
             course_id: course.path,
-            status: 'demo_viewed' 
+            status: 'demo_viewed',
+            user_id: user.id
           }
         ]);
 
       if (error) throw error;
+      
+      window.open(course.demoVideo, '_blank');
       toast.success("Loading demo video...");
     } catch (error) {
       console.error("Error logging demo view:", error);
