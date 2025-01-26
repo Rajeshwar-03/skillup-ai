@@ -116,13 +116,21 @@ export const AIChat = () => {
     setIsLoading(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in to send messages");
+        return;
+      }
+
       // Store the user message in Supabase
       const { error: insertError } = await supabase
         .from('chat_messages')
         .insert([
           { 
             message: userMessage.content,
-            is_assistant: false
+            is_assistant: false,
+            user_id: user.id  // Set the user_id to the authenticated user's ID
           }
         ]);
 
@@ -148,7 +156,8 @@ export const AIChat = () => {
         .insert([
           { 
             message: aiResponse.content,
-            is_assistant: true
+            is_assistant: true,
+            user_id: user.id  // Set the user_id to the authenticated user's ID for AI responses too
           }
         ]);
 
