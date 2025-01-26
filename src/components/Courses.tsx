@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { BookOpen, Video, MessageSquare, Trophy, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -158,6 +158,8 @@ const courses = [
 ];
 
 export const Courses = () => {
+  const navigate = useNavigate();
+
   const handleWatchDemo = async (course: typeof courses[0]) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -184,6 +186,35 @@ export const Courses = () => {
     } catch (error) {
       console.error("Error logging demo view:", error);
       toast.error("Failed to load demo video. Please try again.");
+    }
+  };
+
+  const handleEnroll = async (course: typeof courses[0]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in to enroll in courses");
+        return;
+      }
+
+      const { error } = await supabase
+        .from('course_enrollments')
+        .insert([
+          { 
+            course_id: course.path,
+            status: 'enrolled',
+            user_id: user.id
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast.success("Successfully enrolled in the course!");
+      navigate(`/course/${course.path}`);
+    } catch (error) {
+      console.error("Error enrolling in course:", error);
+      toast.error("Failed to enroll in course. Please try again.");
     }
   };
 
@@ -229,22 +260,27 @@ export const Courses = () => {
                   Watch Demo
                 </button>
               </div>
-              <Link to={`/course/${course.path}`} className="block">
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-                  <p className="text-muted-foreground mb-4">{course.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      <span className="font-medium">{course.rating}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-4 h-4 text-primary" />
-                      <span className="text-sm">{course.students} students</span>
-                    </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                <p className="text-muted-foreground mb-4">{course.description}</p>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                    <span className="font-medium">{course.rating}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-primary" />
+                    <span className="text-sm">{course.students} students</span>
                   </div>
                 </div>
-              </Link>
+                <button
+                  onClick={() => handleEnroll(course)}
+                  className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Enroll Now
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>
