@@ -198,6 +198,20 @@ export const Courses = () => {
         return;
       }
 
+      // Check if user is already enrolled
+      const { data: existingEnrollment } = await supabase
+        .from('course_enrollments')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', course.path)
+        .single();
+
+      if (existingEnrollment) {
+        toast.info("You are already enrolled in this course");
+        navigate(`/course/${course.path}`);
+        return;
+      }
+
       const { error } = await supabase
         .from('course_enrollments')
         .insert([
@@ -212,9 +226,15 @@ export const Courses = () => {
       
       toast.success("Successfully enrolled in the course!");
       navigate(`/course/${course.path}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error enrolling in course:", error);
-      toast.error("Failed to enroll in course. Please try again.");
+      // Handle duplicate enrollment error specifically
+      if (error.code === '23505') {
+        toast.info("You are already enrolled in this course");
+        navigate(`/course/${course.path}`);
+      } else {
+        toast.error("Failed to enroll in course. Please try again.");
+      }
     }
   };
 
