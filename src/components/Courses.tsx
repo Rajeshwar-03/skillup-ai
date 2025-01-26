@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { BookOpen, Video, MessageSquare, Trophy, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const courses = [
   {
@@ -10,7 +12,8 @@ const courses = [
     rating: 4.8,
     students: 2500,
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    path: "full-stack"
+    path: "full-stack",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "AI & Machine Learning",
@@ -19,7 +22,8 @@ const courses = [
     rating: 4.9,
     students: 1800,
     image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c",
-    path: "ai-ml"
+    path: "ai-ml",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Cloud Computing (AWS)",
@@ -28,7 +32,8 @@ const courses = [
     rating: 4.7,
     students: 2100,
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
-    path: "aws"
+    path: "aws",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "DevOps & CI/CD",
@@ -37,7 +42,8 @@ const courses = [
     rating: 4.8,
     students: 1500,
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
-    path: "devops"
+    path: "devops",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Blockchain Development",
@@ -46,7 +52,8 @@ const courses = [
     rating: 4.6,
     students: 1200,
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0",
-    path: "blockchain"
+    path: "blockchain",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "UI/UX Design",
@@ -55,7 +62,8 @@ const courses = [
     rating: 4.9,
     students: 3000,
     image: "https://images.unsplash.com/photo-1561070791-2526d30994b5",
-    path: "ui-ux"
+    path: "ui-ux",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Data Science",
@@ -64,7 +72,8 @@ const courses = [
     rating: 4.8,
     students: 2200,
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
-    path: "data-science"
+    path: "data-science",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Cybersecurity",
@@ -73,7 +82,8 @@ const courses = [
     rating: 4.7,
     students: 1600,
     image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b",
-    path: "cybersecurity"
+    path: "cybersecurity",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Mobile App Development",
@@ -82,7 +92,8 @@ const courses = [
     rating: 4.8,
     students: 2800,
     image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c",
-    path: "mobile-dev"
+    path: "mobile-dev",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Python Programming",
@@ -91,7 +102,8 @@ const courses = [
     rating: 4.9,
     students: 3500,
     image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935",
-    path: "python"
+    path: "python",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Digital Marketing",
@@ -100,7 +112,8 @@ const courses = [
     rating: 4.7,
     students: 2600,
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
-    path: "digital-marketing"
+    path: "digital-marketing",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "IoT Development",
@@ -109,7 +122,8 @@ const courses = [
     rating: 4.6,
     students: 1100,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-    path: "iot"
+    path: "iot",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Game Development",
@@ -118,7 +132,8 @@ const courses = [
     rating: 4.8,
     students: 1900,
     image: "https://images.unsplash.com/photo-1556438064-2d7646166914",
-    path: "game-dev"
+    path: "game-dev",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Cloud Native Development",
@@ -127,7 +142,8 @@ const courses = [
     rating: 4.7,
     students: 1400,
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
-    path: "cloud-native"
+    path: "cloud-native",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   },
   {
     title: "Data Engineering",
@@ -136,11 +152,33 @@ const courses = [
     rating: 4.8,
     students: 1300,
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
-    path: "data-engineering"
+    path: "data-engineering",
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ"
   }
 ];
 
 export const Courses = () => {
+  const handleWatchDemo = async (course: typeof courses[0]) => {
+    window.open(course.demoVideo, '_blank');
+    
+    try {
+      const { error } = await supabase
+        .from('course_enrollments')
+        .insert([
+          { 
+            course_id: course.path,
+            status: 'demo_viewed' 
+          }
+        ]);
+
+      if (error) throw error;
+      toast.success("Loading demo video...");
+    } catch (error) {
+      console.error("Error logging demo view:", error);
+      toast.error("Failed to load demo video. Please try again.");
+    }
+  };
+
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="container mx-auto px-4">
@@ -166,17 +204,24 @@ export const Courses = () => {
               transition={{ delay: index * 0.1 }}
               className="glass rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300"
             >
-              <Link to={`/course/${course.path}`} className="block">
-                <div className="relative h-48">
-                  <img
-                    src={course.image}
-                    alt={course.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-sm font-medium">
-                    {course.level}
-                  </div>
+              <div className="relative h-48">
+                <img
+                  src={course.image}
+                  alt={course.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-sm font-medium">
+                  {course.level}
                 </div>
+                <button
+                  onClick={() => handleWatchDemo(course)}
+                  className="absolute bottom-4 right-4 bg-primary/90 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-primary transition-colors"
+                >
+                  <Video className="w-4 h-4" />
+                  Watch Demo
+                </button>
+              </div>
+              <Link to={`/course/${course.path}`} className="block">
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
                   <p className="text-muted-foreground mb-4">{course.description}</p>

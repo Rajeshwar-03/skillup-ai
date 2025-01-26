@@ -80,7 +80,6 @@ export const AIChat = () => {
       setIsRecording(false);
       toast.success("Recording stopped");
       
-      // Stop all tracks on the stream
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     }
   };
@@ -117,6 +116,19 @@ export const AIChat = () => {
     setIsLoading(true);
 
     try {
+      // Store the user message in Supabase
+      const { error: insertError } = await supabase
+        .from('chat_messages')
+        .insert([
+          { 
+            message: userMessage.content,
+            is_assistant: false
+          }
+        ]);
+
+      if (insertError) throw insertError;
+
+      // Get AI response
       const { data, error } = await supabase.functions.invoke("chat", {
         body: { 
           messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content }))
@@ -129,6 +141,18 @@ export const AIChat = () => {
         role: "assistant" as const, 
         content: data.message || "I apologize, but I couldn't generate a response. Please try again."
       };
+      
+      // Store the AI response in Supabase
+      const { error: aiInsertError } = await supabase
+        .from('chat_messages')
+        .insert([
+          { 
+            message: aiResponse.content,
+            is_assistant: true
+          }
+        ]);
+
+      if (aiInsertError) throw aiInsertError;
       
       setMessages(prev => [...prev, aiResponse]);
       await speakText(aiResponse.content);
