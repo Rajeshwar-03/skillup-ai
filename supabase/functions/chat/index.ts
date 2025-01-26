@@ -23,7 +23,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Using the most efficient model
+        model: 'gpt-4-mini',
         messages: [
           {
             role: 'system',
@@ -32,7 +32,7 @@ serve(async (req) => {
           ...messages
         ],
         temperature: 0.7,
-        max_tokens: 150 // Reduced max tokens to help with quota
+        max_tokens: 150
       }),
     });
 
@@ -40,9 +40,8 @@ serve(async (req) => {
       const errorData = await response.text();
       console.error('OpenAI API error:', errorData);
       
-      // Check specifically for quota errors
-      if (errorData.includes('insufficient_quota')) {
-        throw new Error('OpenAI API quota exceeded. Please update your API key.');
+      if (response.status === 429 || errorData.includes('insufficient_quota')) {
+        throw new Error('OpenAI API rate limit or quota exceeded. Please try again later or update your API key.');
       }
       
       throw new Error(`OpenAI API error: ${errorData}`);
@@ -59,12 +58,15 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in chat function:', error);
+    
+    const errorMessage = error.message.includes('rate limit') || error.message.includes('quota') ?
+      'OpenAI API rate limit or quota exceeded. Please try again later or update your API key.' :
+      'An unexpected error occurred while processing your request.';
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error.message.includes('quota') ? 
-          'Please update your OpenAI API key with one that has available credits.' : 
-          'An unexpected error occurred.'
+        error: errorMessage,
+        details: error.message
       }),
       { 
         status: 500,
