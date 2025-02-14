@@ -14,17 +14,24 @@ serve(async (req) => {
 
   try {
     const { messages } = await req.json();
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
+    // Add logging to check if API key is loaded
+    console.log('API Key loaded:', openAIApiKey ? 'Yes' : 'No');
     console.log('Received messages:', messages);
+
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not found in environment variables');
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',  // Changed from gpt-4-mini to gpt-4o-mini
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -123,6 +130,19 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in chat function:', error);
+    
+    if (!Deno.env.get('OPENAI_API_KEY')) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'OpenAI API key not found. Please make sure it is properly set in the environment variables.',
+          details: 'Missing API key'
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
     
     const errorMessage = error.message.includes('rate limit') || error.message.includes('quota') ?
       'OpenAI API rate limit or quota exceeded. Please try again later or update your API key.' :
