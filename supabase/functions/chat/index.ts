@@ -16,12 +16,27 @@ serve(async (req) => {
     const { messages } = await req.json();
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-    // Add logging to check if API key is loaded
-    console.log('API Key loaded:', openAIApiKey ? 'Yes' : 'No');
-    console.log('Received messages:', messages);
+    // Add more detailed logging for debugging
+    console.log('API Key loaded:', openAIApiKey ? 'Yes (length: ' + openAIApiKey.length + ')' : 'No');
+    console.log('Received messages count:', messages?.length || 0);
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not found in environment variables');
+    }
+
+    // Test API key validity with a simple request before main call
+    const testResponse = await fetch('https://api.openai.com/v1/models', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!testResponse.ok) {
+      const testErrorData = await testResponse.text();
+      console.error('OpenAI API key validation failed:', testErrorData);
+      throw new Error(`OpenAI API key validation failed: ${testResponse.status} ${testErrorData}`);
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -31,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-3.5-turbo', // Fallback to 3.5-turbo if 4o-mini has quota issues
         messages: [
           {
             role: 'system',
@@ -120,7 +135,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('OpenAI response:', data);
+    console.log('OpenAI response received successfully');
     
     const message = data.choices[0].message.content;
 

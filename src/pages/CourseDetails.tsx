@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type CourseType = {
   title: string;
@@ -16,6 +17,7 @@ type CourseType = {
   rating: number;
   instructor: string;
   price: string;
+  demoVideo: string;
   features: string[];
   materials: Array<{
     title: string;
@@ -45,6 +47,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.8,
     instructor: "Dr. Sarah Johnson",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/bMknfKXIFA8",
     features: [
       "Comprehensive MERN Stack Coverage",
       "Real-world Project Development",
@@ -73,6 +76,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.9,
     instructor: "Dr. Michael Chen",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/i_LwzRVP7bg",
     features: [
       "Deep Learning Fundamentals",
       "Neural Network Architecture",
@@ -101,6 +105,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.7,
     instructor: "Dr. Mark Anderson",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/k1RI5locZE4",
     features: [
       "AWS Core Services Deep Dive",
       "Cloud Architecture Design",
@@ -129,6 +134,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.8,
     instructor: "Dr. Alex Smith",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/j5Zsa_eOXeY",
     features: [
       "CI/CD Pipeline Setup",
       "Containerization with Docker",
@@ -157,6 +163,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.6,
     instructor: "Dr. Lisa White",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/gyMwXuJrbJQ",
     features: [
       "Blockchain Fundamentals",
       "Smart Contract Development",
@@ -462,22 +469,82 @@ const CourseDetails = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [showDemoVideo, setShowDemoVideo] = useState(false);
   const course = courseData[courseId as keyof typeof courseData];
 
   if (!course) {
     return <div>Course not found</div>;
   }
 
-  const handleEnroll = () => {
-    toast.success("Successfully enrolled! Check your email for next steps.");
+  const handleEnroll = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in to enroll in courses");
+        return;
+      }
+
+      const { data: existingEnrollment } = await supabase
+        .from('course_enrollments')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', courseId)
+        .single();
+
+      if (existingEnrollment) {
+        toast.info("You are already enrolled in this course");
+        return;
+      }
+
+      const { error } = await supabase
+        .from('course_enrollments')
+        .insert([
+          { 
+            course_id: courseId,
+            status: 'enrolled',
+            user_id: user.id
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast.success("Successfully enrolled! Check your email for next steps.");
+    } catch (error: any) {
+      console.error("Error enrolling in course:", error);
+      if (error.code === '23505') {
+        toast.info("You are already enrolled in this course");
+      } else {
+        toast.error("Failed to enroll in course. Please try again.");
+      }
+    }
+  };
+
+  const handleWatchDemo = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        await supabase
+          .from('course_enrollments')
+          .insert([
+            { 
+              course_id: courseId,
+              status: 'demo_viewed',
+              user_id: user.id
+            }
+          ])
+          .match({ user_id: user.id, course_id: courseId, status: 'demo_viewed' });
+      }
+      
+      setShowDemoVideo(true);
+    } catch (error) {
+      console.error("Error logging demo view:", error);
+    }
   };
 
   const handleDownload = () => {
     toast.success("Materials downloading...");
-  };
-
-  const handleWatchDemo = () => {
-    toast.success("Loading demo video...");
   };
 
   return (
@@ -493,9 +560,32 @@ const CourseDetails = () => {
         Back
       </Button>
       
+      {showDemoVideo && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+          <div className="relative w-full max-w-4xl mx-auto">
+            <Button 
+              onClick={() => setShowDemoVideo(false)} 
+              variant="secondary"
+              className="absolute -top-12 right-0"
+            >
+              Close
+            </Button>
+            <div className="relative pt-[56.25%] rounded-lg overflow-hidden">
+              <iframe
+                src={course.demoVideo}
+                className="absolute top-0 left-0 w-full h-full"
+                title={`${course.title} Demo`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <main className="container mx-auto px-4 pt-24">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -522,7 +612,22 @@ const CourseDetails = () => {
               </div>
             </div>
 
-            {/* Tabs Navigation */}
+            <div className="mb-6 relative rounded-xl overflow-hidden cursor-pointer group" onClick={handleWatchDemo}>
+              <div className="aspect-video bg-gray-200 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/90 text-white flex items-center justify-center 
+                                 transition-all group-hover:scale-110">
+                    <PlayCircle className="w-8 h-8" />
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute bottom-4 left-4 text-white text-lg font-medium">
+                    Watch Course Demo
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex space-x-4 mb-6 border-b">
               {["overview", "materials", "reviews", "schedule"].map((tab) => (
                 <button
@@ -539,7 +644,6 @@ const CourseDetails = () => {
               ))}
             </div>
 
-            {/* Tab Content */}
             <div className="space-y-6">
               {selectedTab === "overview" && (
                 <div className="glass rounded-2xl p-6">
@@ -645,7 +749,6 @@ const CourseDetails = () => {
             </div>
           </motion.div>
 
-          {/* Sidebar */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
