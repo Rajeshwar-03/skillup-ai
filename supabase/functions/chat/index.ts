@@ -24,21 +24,9 @@ serve(async (req) => {
       throw new Error('OpenAI API key not found in environment variables');
     }
 
-    // Test API key validity with a simple request before main call
-    const testResponse = await fetch('https://api.openai.com/v1/models', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!testResponse.ok) {
-      const testErrorData = await testResponse.text();
-      console.error('OpenAI API key validation failed:', testErrorData);
-      throw new Error(`OpenAI API key validation failed: ${testResponse.status} ${testErrorData}`);
-    }
-
+    // Skip API key validation test to avoid unnecessary API calls and quota usage
+    console.log('Calling OpenAI chat completions API');
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -46,7 +34,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo', // Fallback to 3.5-turbo if 4o-mini has quota issues
+        model: 'gpt-4o-mini', // Using the recommended model gpt-4o-mini instead of older models
         messages: [
           {
             role: 'system',
