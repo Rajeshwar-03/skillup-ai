@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft } from "lucide-react";
@@ -192,6 +193,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.9,
     instructor: "Dr. John Brown",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/c9Wg6Cb_YlU",
     features: [
       "User Research Techniques",
       "Wireframing and Prototyping",
@@ -220,6 +222,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.8,
     instructor: "Dr. Sarah Lee",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/ua-CiDNNj30",
     features: [
       "Data Analysis with Python",
       "Data Visualization Techniques",
@@ -248,6 +251,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.7,
     instructor: "Dr. Kevin Green",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/BsxdJTKRqNk",
     features: [
       "Network Security Fundamentals",
       "Ethical Hacking Techniques",
@@ -276,6 +280,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.8,
     instructor: "Dr. Rachel Adams",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/0-S5a0eXPoc",
     features: [
       "React Native Fundamentals",
       "Mobile UI Design",
@@ -304,6 +309,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.9,
     instructor: "Dr. Mark Wilson",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/rfscVS0vtbw",
     features: [
       "Python Basics",
       "Data Structures and Algorithms",
@@ -332,6 +338,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.7,
     instructor: "Dr. Anna Taylor",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/uqJR-U1fTn8",
     features: [
       "SEO Fundamentals",
       "Social Media Strategies",
@@ -360,6 +367,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.6,
     instructor: "Dr. Chris Martinez",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/h0gWfVCSGQQ",
     features: [
       "IoT Fundamentals",
       "Device Communication Protocols",
@@ -388,6 +396,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.8,
     instructor: "Dr. Jessica Thompson",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/gB1F9G0JXOo",
     features: [
       "Game Design Principles",
       "Unity Fundamentals",
@@ -416,6 +425,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.7,
     instructor: "Dr. Brian Harris",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/d6WC5n9G_sM",
     features: [
       "Kubernetes Fundamentals",
       "Microservices Architecture",
@@ -444,6 +454,7 @@ const courseData: Record<string, CourseType> = {
     rating: 4.8,
     instructor: "Dr. Emily Clark",
     price: "Free",
+    demoVideo: "https://www.youtube.com/embed/qWru-b6m030",
     features: [
       "Data Pipeline Fundamentals",
       "ETL Processes",
