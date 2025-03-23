@@ -14,7 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, action } = await req.json();
+    const requestData = await req.json();
+    const { messages, action, courseId, courseTitle, price } = requestData;
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
 
@@ -31,7 +32,6 @@ serve(async (req) => {
       }
 
       try {
-        const { courseId, courseTitle, price } = await req.json();
         console.log(`Creating payment for course: ${courseId} - ${courseTitle} at $${price}`);
 
         const stripe = new Stripe(stripeSecretKey, {
@@ -92,43 +92,48 @@ serve(async (req) => {
             - Prerequisites: Basic HTML, CSS, JavaScript
             - Key topics: React, Node.js, Express, MongoDB
             - Career opportunities: Web Developer, Full Stack Engineer
-            - Price: $199
+            - Price: $3 (Intermediate level)
 
             2. AI & Machine Learning:
             - Prerequisites: Python, Basic Statistics
             - Key topics: Neural Networks, Deep Learning, TensorFlow
             - Career opportunities: ML Engineer, AI Researcher
-            - Price: $249
+            - Price: $6 (Advanced level)
 
             3. Cloud Computing (AWS):
             - Prerequisites: Basic networking
             - Key topics: EC2, S3, Lambda, CloudFormation
             - Career opportunities: Cloud Architect, DevOps Engineer
-            - Price: $179
+            - Price: $3 (Intermediate level)
 
             4. DevOps & CI/CD:
             - Prerequisites: Linux basics, Git
             - Key topics: Docker, Kubernetes, Jenkins
             - Career opportunities: DevOps Engineer, SRE
-            - Price: $199
+            - Price: $6 (Advanced level)
 
             5. UI/UX Design:
             - Prerequisites: None
             - Key topics: Design principles, Figma, User Research
             - Career opportunities: UI Designer, UX Researcher
-            - Price: $149
+            - Price: Free (Beginner level)
 
             And more specialized courses in:
-            - Blockchain Development ($249)
-            - Data Science ($229)
-            - Cybersecurity ($219)
-            - Mobile App Development ($189)
-            - Digital Marketing ($129)
-            - Python Programming ($149)
-            - IoT Development ($179)
-            - Game Development ($199)
-            - Cloud Native Development ($189)
-            - Data Engineering ($209)
+            - Blockchain Development ($6 - Advanced)
+            - Data Science ($3 - Intermediate)
+            - Cybersecurity ($6 - Advanced)
+            - Mobile App Development ($3 - Intermediate)
+            - Digital Marketing (Free - Beginner)
+            - Python Programming (Free - Beginner)
+            - IoT Development ($6 - Advanced)
+            - Game Development ($3 - Intermediate)
+            - Cloud Native Development ($6 - Advanced)
+            - Data Engineering ($6 - Advanced)
+
+            PRICING STRUCTURE:
+            - Beginner courses: Free
+            - Intermediate courses: $3
+            - Advanced courses: $6
 
             PURCHASE INFORMATION:
             - If users want to purchase a course, tell them they can sign up for any course by typing "I want to purchase [course name]"
@@ -140,7 +145,7 @@ serve(async (req) => {
             - Provide specific information about prerequisites
             - Mention key topics covered
             - Include career opportunities
-            - Share the price
+            - Share the price based on difficulty level
             - Suggest related courses when relevant
 
             2. For general questions:
