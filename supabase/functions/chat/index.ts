@@ -78,7 +78,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a friendly and knowledgeable AI learning assistant focused on skill development and education. You provide engaging, informative responses about our courses and learning paths. Here's how you should interact:
+            content: `You are a friendly and knowledgeable AI learning assistant focused on skill development and education. You provide engaging, informative responses about our courses and learning paths. Respond only in English. Here's how you should interact:
 
             GREETINGS:
             - Respond warmly to greetings like "Hi", "Hello", "Hey", "Good morning/afternoon/evening"

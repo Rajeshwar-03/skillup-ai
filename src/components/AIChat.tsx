@@ -11,7 +11,7 @@ export const AIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { 
       role: "assistant", 
-      content: "Hello! I'm here to assist you with your learning journey. Feel free to speak or type in any language you're comfortable with. You can click the microphone button to start speaking, and I'll convert your voice to text. How can I help you today?" 
+      content: "Hello! I'm here to assist you with your learning journey. How can I help you today?" 
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +78,7 @@ export const AIChat = () => {
         >
           <h2 className="text-4xl font-bold mb-4 gradient-text">AI Learning Assistant</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Speak or type in any language - I'm here to help with your learning journey
+            Chat with our AI to get answers about your learning journey
           </p>
         </motion.div>
 
