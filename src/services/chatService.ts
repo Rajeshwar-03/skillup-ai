@@ -41,7 +41,17 @@ export const sendChatRequest = async (messages: ChatMessage[]) => {
       }
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error("Edge function error:", error);
+      // For API quota errors, provide a specific message
+      if (error.message?.includes('quota') || error.message?.includes('rate limit')) {
+        return { 
+          success: true, 
+          message: "I'm currently experiencing high demand. Please try again in a few moments or contact support if this persists."
+        };
+      }
+      throw error;
+    }
     
     return { 
       success: true, 
@@ -49,7 +59,10 @@ export const sendChatRequest = async (messages: ChatMessage[]) => {
     };
   } catch (error) {
     console.error("Error sending chat request:", error);
-    toast.error("Failed to get a response. Please try again.");
-    return { success: false, message: "" };
+    // Return a fallback message instead of showing an error toast
+    return { 
+      success: true, 
+      message: "I'm currently experiencing technical difficulties. Please try again later." 
+    };
   }
 };

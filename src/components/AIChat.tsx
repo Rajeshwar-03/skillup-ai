@@ -17,9 +17,19 @@ export const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { isSpeaking, speakText } = useTextToSpeech();
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to bottom whenever messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+    
+    // Add a small delay to ensure DOM has updated
+    const timeoutId = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timeoutId);
   }, [messages]);
 
   const handleSendMessage = async (message: string) => {
@@ -68,7 +78,7 @@ export const AIChat = () => {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section id="chat" className="py-24 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -90,7 +100,10 @@ export const AIChat = () => {
             className="glass rounded-2xl p-6"
           >
             <div className="flex flex-col h-[400px]">
-              <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+              <div 
+                ref={messagesContainerRef} 
+                className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2"
+              >
                 {messages.map((msg, index) => (
                   <ChatMessageComponent key={index} role={msg.role} content={msg.content} />
                 ))}

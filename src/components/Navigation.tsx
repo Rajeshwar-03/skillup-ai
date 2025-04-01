@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Menu, X, User } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -44,6 +45,14 @@ export const Navigation = () => {
       console.error('Error checking auth state:', error);
       toast.error('Authentication error. Please try logging in again.');
       navigate('/signup');
+    }
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    setIsOpen(false);
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -97,16 +106,20 @@ export const Navigation = () => {
           </div>
 
           <div className={`${isOpen ? 'flex' : 'hidden'} md:flex absolute md:relative top-20 md:top-0 left-0 right-0 md:right-auto flex-col md:flex-row items-center space-y-4 md:space-y-0 space-x-0 md:space-x-8 bg-white/90 md:bg-transparent backdrop-blur-lg md:backdrop-blur-none p-6 md:p-0 border-t md:border-t-0 border-white/20`}>
-            {["Features", "Courses", "Community"].map((item, index) => (
-              <motion.a
+            {[
+              { name: "Features", id: "features" },
+              { name: "Courses", id: "courses" },
+              { name: "Community", id: "community" }
+            ].map((item, index) => (
+              <motion.button
                 key={index}
-                href={`#${item.toLowerCase()}`}
+                onClick={() => scrollToSection(item.id)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
               >
-                {item}
-              </motion.a>
+                {item.name}
+              </motion.button>
             ))}
             {!isAuthenticated && (
               <motion.button
