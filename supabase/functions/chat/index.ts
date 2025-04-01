@@ -15,11 +15,12 @@ serve(async (req) => {
 
   try {
     const requestData = await req.json();
-    const { messages, action, courseId, courseTitle, price } = requestData;
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const { messages, action, courseId, courseTitle, price, userApiKey } = requestData;
+    const openAIApiKey = userApiKey || Deno.env.get('OPENAI_API_KEY');
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
 
     // Add more detailed logging for debugging
+    console.log('Using user provided API key:', userApiKey ? 'Yes' : 'No');
     console.log('OpenAI API Key loaded:', openAIApiKey ? 'Yes (length: ' + openAIApiKey.length + ')' : 'No');
     console.log('Stripe API Key loaded:', stripeSecretKey ? 'Yes (length: ' + stripeSecretKey.length + ')' : 'No');
     console.log('Received messages count:', messages?.length || 0);
@@ -61,7 +62,7 @@ serve(async (req) => {
 
     // Regular chat handling with OpenAI
     if (!openAIApiKey) {
-      throw new Error('OpenAI API key not found in environment variables');
+      throw new Error('OpenAI API key not found. Please provide your own API key or contact support.');
     }
 
     // Skip API key validation test to avoid unnecessary API calls and quota usage
@@ -190,10 +191,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in chat function:', error);
     
-    if (!Deno.env.get('OPENAI_API_KEY')) {
+    if (!Deno.env.get('OPENAI_API_KEY') && !requestData?.userApiKey) {
       return new Response(
         JSON.stringify({ 
-          error: 'OpenAI API key not found. Please make sure it is properly set in the environment variables.',
+          error: 'OpenAI API key not found. Please provide your own API key or contact support.',
           details: 'Missing API key'
         }),
         { 
