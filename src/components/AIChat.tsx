@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ChatMessage as ChatMessageComponent } from "./chat/ChatMessage";
 import { ChatInput } from "./chat/ChatInput";
-import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { ChatMessage, saveChatMessage, sendChatRequest } from "@/services/chatService";
 
 export const AIChat = () => {
@@ -16,7 +15,6 @@ export const AIChat = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { isSpeaking, speakText } = useTextToSpeech();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom whenever messages change
@@ -61,19 +59,12 @@ export const AIChat = () => {
         await saveChatMessage(aiResponse.content, true);
         
         setMessages(prev => [...prev, aiResponse]);
-        await speakText(aiResponse.content);
       }
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again.");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSpeakLastMessage = () => {
-    if (messages.length > 0) {
-      speakText(messages[messages.length - 1].content);
     }
   };
 
@@ -112,10 +103,7 @@ export const AIChat = () => {
 
               <ChatInput 
                 onSendMessage={handleSendMessage}
-                isSpeaking={isSpeaking}
                 isLoading={isLoading}
-                onSpeakLastMessage={handleSpeakLastMessage}
-                lastMessageExists={messages.length > 0}
               />
             </div>
           </motion.div>

@@ -1,22 +1,16 @@
 
-import { Send, Speaker } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
-  isSpeaking: boolean;
   isLoading: boolean;
-  onSpeakLastMessage: () => void;
-  lastMessageExists: boolean;
 }
 
 export const ChatInput = ({ 
   onSendMessage, 
-  isSpeaking, 
-  isLoading, 
-  onSpeakLastMessage,
-  lastMessageExists
+  isLoading
 }: ChatInputProps) => {
   const [message, setMessage] = useState("");
 
@@ -44,16 +38,6 @@ export const ChatInput = ({
         className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
         disabled={isLoading}
       />
-      
-      <Button
-        variant="outline"
-        size="icon"
-        className={isSpeaking ? "animate-pulse" : ""}
-        onClick={onSpeakLastMessage}
-        disabled={isSpeaking || !lastMessageExists || isLoading}
-      >
-        <Speaker className="w-4 h-4" />
-      </Button>
 
       <Button
         variant="default"
