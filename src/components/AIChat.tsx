@@ -17,10 +17,10 @@ export const AIChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom whenever messages change
+  // Only scroll to bottom when new messages are added, not on initial load
   useEffect(() => {
     const scrollToBottom = () => {
-      if (messagesEndRef.current) {
+      if (messagesEndRef.current && messages.length > 1) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
       }
     };
