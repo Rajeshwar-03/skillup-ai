@@ -102,7 +102,7 @@ export const checkCourseEnrollment = async (courseId: string) => {
   }
 };
 
-// New function to simulate a payment for courses
+// Enhanced payment simulation function with better verification
 export const simulatePayment = async (courseId: string, paymentMethod: string) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -124,12 +124,39 @@ export const simulatePayment = async (courseId: string, paymentMethod: string) =
     }
     
     // In a real implementation, this would call a payment processing API
-    // For this simulation, we'll just simulate a successful payment
+    // For this simulation, after a simulated payment success, immediately enroll the user
+    
+    const transactionId = `TX-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+    
+    // Immediately enroll the user after successful payment
+    const { error } = await supabase
+      .from('course_enrollments')
+      .insert([
+        { 
+          course_id: courseId,
+          status: 'enrolled',
+          payment_method: paymentMethod,
+          transaction_id: transactionId,
+          user_id: user.id
+        }
+      ]);
+    
+    if (error) {
+      if (error.code === '23505') { // Duplicate key error
+        return {
+          success: true,
+          message: "You are already enrolled in this course",
+          transactionId: null,
+          alreadyEnrolled: true
+        };
+      }
+      throw error;
+    }
     
     return {
       success: true,
-      message: "Payment successful",
-      transactionId: `TX-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+      message: "Payment successful! You are now enrolled in the course.",
+      transactionId,
       alreadyEnrolled: false
     };
   } catch (error) {

@@ -364,7 +364,8 @@ export const Courses = () => {
                   <PaymentOptions
                     courseTitle={course.title}
                     price={course.price}
-                    onPaymentComplete={() => completeEnrollment(course.path)}
+                    courseId={course.path}
+                    onPaymentComplete={(courseId) => completeEnrollment(courseId)}
                   />
                 )}
               </div>

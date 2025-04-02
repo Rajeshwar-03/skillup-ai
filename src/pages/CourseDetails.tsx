@@ -847,8 +847,8 @@ const CourseDetails = () => {
                             {review.name.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-medium">{review.name}</p>
-                            <div className="flex items-center">
+                            <div className="font-medium">{review.name}</div>
+                            <div className="text-sm text-muted-foreground">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
                                   key={i}
