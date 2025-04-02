@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft, ArrowRight } from "lucide-react";
@@ -680,7 +681,9 @@ const CourseDetails = () => {
     toast.success("Materials downloading...");
   };
 
+  // Fix the liveSessionSchedule type issues
   const fixedLiveSessionSchedule = course.liveSessionSchedule.map(session => {
+    // Check if the session has 'name' property instead of 'topic'
     if ('name' in session && !('topic' in session)) {
       return {
         topic: session.name as unknown as string,

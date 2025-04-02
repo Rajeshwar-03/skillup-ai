@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Copy, CreditCard, DebitCard, QrCode, ArrowRight } from "lucide-react";
+import { Check, Copy, CreditCard, QrCode, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { simulatePayment, checkCourseEnrollment } from "@/services/chatService";
 
@@ -191,7 +191,7 @@ export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete
                   Credit Card
                 </TabsTrigger>
                 <TabsTrigger value="debit">
-                  <DebitCard className="mr-2 h-4 w-4" />
+                  <CreditCard className="mr-2 h-4 w-4" />
                   Debit Card
                 </TabsTrigger>
               </TabsList>
