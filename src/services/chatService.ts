@@ -41,7 +41,7 @@ export const sendChatRequest = async (messages: ChatMessage[]) => {
     const { data, error } = await supabase.functions.invoke("chat", {
       body: { 
         messages: messages.map(m => ({ role: m.role, content: m.content })),
-        userApiKey: userApiKey || null  // Pass the user API key to the edge function
+        userApiKey: userApiKey || null,  // Pass the user API key to the edge function
       }
     });
 
@@ -67,6 +67,32 @@ export const sendChatRequest = async (messages: ChatMessage[]) => {
     return { 
       success: true, 
       message: "I'm currently experiencing technical difficulties. Please try again later or add your own OpenAI API key." 
+    };
+  }
+};
+
+// New function to simulate a payment for courses
+export const simulatePayment = async (courseId: string, paymentMethod: string) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+    
+    // In a real implementation, this would call a payment processing API
+    // For this simulation, we'll just simulate a successful payment
+    
+    return {
+      success: true,
+      message: "Payment successful",
+      transactionId: `TX-${Math.random().toString(36).substring(2, 10).toUpperCase()}`
+    };
+  } catch (error) {
+    console.error("Error processing payment:", error);
+    return {
+      success: false,
+      message: "Payment failed. Please try again."
     };
   }
 };

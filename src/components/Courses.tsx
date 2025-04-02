@@ -1,9 +1,9 @@
-
 import { motion } from "framer-motion";
 import { BookOpen, Video, MessageSquare, Trophy, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PaymentOptions } from "./PaymentOptions";
 
 const courses = [
   {
@@ -214,41 +214,39 @@ export const Courses = () => {
         return;
       }
 
-      // If course requires payment (not free), redirect to payment page
-      if (course.price > 0) {
-        // Navigate to payment page with course info
-        navigate(`/course/${course.path}?enroll=true`);
-        return;
-      }
-
       // For free courses, enroll directly
-      const { data: existingEnrollment } = await supabase
-        .from('course_enrollments')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('course_id', course.path)
-        .single();
+      if (course.price === 0) {
+        const { data: existingEnrollment } = await supabase
+          .from('course_enrollments')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('course_id', course.path)
+          .single();
 
-      if (existingEnrollment) {
-        toast.info("You are already enrolled in this course");
+        if (existingEnrollment) {
+          toast.info("You are already enrolled in this course");
+          navigate(`/course/${course.path}`);
+          return;
+        }
+
+        const { error } = await supabase
+          .from('course_enrollments')
+          .insert([
+            { 
+              course_id: course.path,
+              status: 'enrolled',
+              user_id: user.id
+            }
+          ]);
+
+        if (error) throw error;
+        
+        toast.success("Successfully enrolled in the course!");
         navigate(`/course/${course.path}`);
-        return;
+      } else {
+        // For paid courses, navigate to course details page
+        navigate(`/course/${course.path}?enroll=true`);
       }
-
-      const { error } = await supabase
-        .from('course_enrollments')
-        .insert([
-          { 
-            course_id: course.path,
-            status: 'enrolled',
-            user_id: user.id
-          }
-        ]);
-
-      if (error) throw error;
-      
-      toast.success("Successfully enrolled in the course!");
-      navigate(`/course/${course.path}`);
     } catch (error: any) {
       console.error("Error enrolling in course:", error);
       // Handle duplicate enrollment error specifically
@@ -261,8 +259,41 @@ export const Courses = () => {
     }
   };
 
+  const completeEnrollment = async (courseId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in to enroll in courses");
+        return;
+      }
+
+      const { error } = await supabase
+        .from('course_enrollments')
+        .insert([
+          { 
+            course_id: courseId,
+            status: 'enrolled',
+            user_id: user.id
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast.success("Payment successful! You are now enrolled in the course.");
+      navigate(`/course/${courseId}`);
+    } catch (error: any) {
+      console.error("Error enrolling after payment:", error);
+      if (error.code === '23505') {
+        toast.info("You are already enrolled in this course");
+      } else {
+        toast.error("Enrollment failed. Please contact support.");
+      }
+    }
+  };
+
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-24 relative overflow-hidden" id="courses">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -321,13 +352,21 @@ export const Courses = () => {
                     {course.price === 0 ? "Free" : `$${course.price}`}
                   </span>
                 </div>
-                <button
-                  onClick={() => handleEnroll(course)}
-                  className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  {course.price === 0 ? "Enroll Now" : "Buy Now"}
-                </button>
+                {course.price === 0 ? (
+                  <button
+                    onClick={() => handleEnroll(course)}
+                    className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Enroll Now
+                  </button>
+                ) : (
+                  <PaymentOptions
+                    courseTitle={course.title}
+                    price={course.price}
+                    onPaymentComplete={() => completeEnrollment(course.path)}
+                  />
+                )}
               </div>
             </motion.div>
           ))}

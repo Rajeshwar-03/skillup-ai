@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft } from "lucide-react";
@@ -8,6 +7,7 @@ import { Navigation } from "@/components/Navigation";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PaymentOptions } from "@/components/PaymentOptions";
 
 type CourseType = {
   title: string;
@@ -17,7 +17,7 @@ type CourseType = {
   students: number;
   rating: number;
   instructor: string;
-  price: number; // Changed to number
+  price: number;
   demoVideo: string;
   features: string[];
   materials: Array<{
@@ -47,7 +47,7 @@ const courseData: Record<string, CourseType> = {
     students: 2500,
     rating: 4.8,
     instructor: "Dr. Sarah Johnson",
-    price: 3, // $3 for Intermediate
+    price: 3,
     demoVideo: "https://www.youtube.com/embed/bMknfKXIFA8",
     features: [
       "Comprehensive MERN Stack Coverage",
@@ -76,7 +76,7 @@ const courseData: Record<string, CourseType> = {
     students: 1800,
     rating: 4.9,
     instructor: "Dr. Michael Chen",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/i_LwzRVP7bg",
     features: [
       "Deep Learning Fundamentals",
@@ -105,7 +105,7 @@ const courseData: Record<string, CourseType> = {
     students: 2100,
     rating: 4.7,
     instructor: "Dr. Mark Anderson",
-    price: 3, // $3 for Intermediate
+    price: 3,
     demoVideo: "https://www.youtube.com/embed/k1RI5locZE4",
     features: [
       "AWS Core Services Deep Dive",
@@ -134,7 +134,7 @@ const courseData: Record<string, CourseType> = {
     students: 1500,
     rating: 4.8,
     instructor: "Dr. Alex Smith",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/j5Zsa_eOXeY",
     features: [
       "CI/CD Pipeline Setup",
@@ -163,7 +163,7 @@ const courseData: Record<string, CourseType> = {
     students: 1200,
     rating: 4.6,
     instructor: "Dr. Lisa White",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/gyMwXuJrbJQ",
     features: [
       "Blockchain Fundamentals",
@@ -192,7 +192,7 @@ const courseData: Record<string, CourseType> = {
     students: 3000,
     rating: 4.9,
     instructor: "Dr. John Brown",
-    price: 0, // Free for Beginner
+    price: 0,
     demoVideo: "https://www.youtube.com/embed/c9Wg6Cb_YlU",
     features: [
       "User Research Techniques",
@@ -221,7 +221,7 @@ const courseData: Record<string, CourseType> = {
     students: 2200,
     rating: 4.8,
     instructor: "Dr. Sarah Lee",
-    price: 3, // $3 for Intermediate
+    price: 3,
     demoVideo: "https://www.youtube.com/embed/ua-CiDNNj30",
     features: [
       "Data Analysis with Python",
@@ -250,7 +250,7 @@ const courseData: Record<string, CourseType> = {
     students: 1600,
     rating: 4.7,
     instructor: "Dr. Kevin Green",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/BsxdJTKRqNk",
     features: [
       "Network Security Fundamentals",
@@ -268,7 +268,7 @@ const courseData: Record<string, CourseType> = {
     ],
     liveSessionSchedule: [
       { topic: "Network Security Best Practices", day: "Monday", time: "10:00 AM" },
-      { topic: "Ethical Hacking Workshop", day: "Wednesday", time: "2:00 PM" },
+      { name: "Ethical Hacking Workshop", day: "Wednesday", time: "2:00 PM" },
     ],
   },
   "mobile-dev": {
@@ -279,7 +279,7 @@ const courseData: Record<string, CourseType> = {
     students: 2800,
     rating: 4.8,
     instructor: "Dr. Rachel Adams",
-    price: 3, // $3 for Intermediate
+    price: 3,
     demoVideo: "https://www.youtube.com/embed/0-S5a0eXPoc",
     features: [
       "React Native Fundamentals",
@@ -308,7 +308,7 @@ const courseData: Record<string, CourseType> = {
     students: 3500,
     rating: 4.9,
     instructor: "Dr. Mark Wilson",
-    price: 0, // Free for Beginner
+    price: 0,
     demoVideo: "https://www.youtube.com/embed/rfscVS0vtbw",
     features: [
       "Python Basics",
@@ -337,7 +337,7 @@ const courseData: Record<string, CourseType> = {
     students: 2600,
     rating: 4.7,
     instructor: "Dr. Anna Taylor",
-    price: 0, // Free for Beginner
+    price: 0,
     demoVideo: "https://www.youtube.com/embed/uqJR-U1fTn8",
     features: [
       "SEO Fundamentals",
@@ -366,7 +366,7 @@ const courseData: Record<string, CourseType> = {
     students: 1100,
     rating: 4.6,
     instructor: "Dr. Chris Martinez",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/h0gWfVCSGQQ",
     features: [
       "IoT Fundamentals",
@@ -395,7 +395,7 @@ const courseData: Record<string, CourseType> = {
     students: 1900,
     rating: 4.8,
     instructor: "Dr. Jessica Thompson",
-    price: 3, // $3 for Intermediate
+    price: 3,
     demoVideo: "https://www.youtube.com/embed/gB1F9G0JXOo",
     features: [
       "Game Design Principles",
@@ -424,7 +424,7 @@ const courseData: Record<string, CourseType> = {
     students: 1400,
     rating: 4.7,
     instructor: "Dr. Brian Harris",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/d6WC5n9G_sM",
     features: [
       "Kubernetes Fundamentals",
@@ -453,7 +453,7 @@ const courseData: Record<string, CourseType> = {
     students: 1300,
     rating: 4.8,
     instructor: "Dr. Emily Clark",
-    price: 6, // $6 for Advanced
+    price: 6,
     demoVideo: "https://www.youtube.com/embed/qWru-b6m030",
     features: [
       "Data Pipeline Fundamentals",
@@ -508,7 +508,6 @@ const CourseDetails = () => {
         return;
       }
 
-      // Call our edge function to create a payment intent
       const response = await fetch('https://uecljvnuuwkvdxcmveho.supabase.co/functions/v1/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -528,12 +527,9 @@ const CourseDetails = () => {
       const data = await response.json();
       setClientSecret(data.clientSecret);
 
-      // In a production app, you would now use the clientSecret with Stripe Elements or Checkout
-      // For this example, we'll simulate a successful payment
       setTimeout(() => {
         completeEnrollment();
       }, 2000);
-
     } catch (error: any) {
       console.error("Payment error:", error);
       toast.error("Payment processing failed. Please try again.");
@@ -565,7 +561,6 @@ const CourseDetails = () => {
       
       toast.success("Payment successful! You are now enrolled in the course.");
       setProcessingPayment(false);
-      // Remove the query parameter
       navigate(`/course/${courseId}`);
     } catch (error: any) {
       console.error("Error enrolling after payment:", error);
@@ -587,13 +582,11 @@ const CourseDetails = () => {
         return;
       }
 
-      // If course requires payment, start payment process
       if (course.price > 0) {
         handlePayment();
         return;
       }
 
-      // For free courses, enroll directly
       const { data: existingEnrollment } = await supabase
         .from('course_enrollments')
         .select('id')
@@ -874,10 +867,18 @@ const CourseDetails = () => {
                     <span className="animate-pulse">Processing Payment...</span>
                   </Button>
                 ) : (
-                  <Button className="w-full" size="lg" onClick={handleEnroll}>
-                    <PlayCircle className="mr-2" />
-                    {course.price === 0 ? "Enroll Now" : "Purchase Course"}
-                  </Button>
+                  course.price > 0 ? (
+                    <PaymentOptions 
+                      courseTitle={course.title}
+                      price={course.price}
+                      onPaymentComplete={completeEnrollment}
+                    />
+                  ) : (
+                    <Button className="w-full" size="lg" onClick={handleEnroll}>
+                      <PlayCircle className="mr-2" />
+                      Enroll Now (Free)
+                    </Button>
+                  )
                 )}
                 
                 <Button variant="outline" className="w-full" size="lg" onClick={handleWatchDemo}>
