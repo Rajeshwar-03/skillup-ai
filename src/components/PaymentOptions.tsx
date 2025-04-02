@@ -1,21 +1,38 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Copy, CreditCard, QrCode } from "lucide-react";
+import { Check, Copy, CreditCard, QrCode, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { simulatePayment, checkCourseEnrollment } from "@/services/chatService";
 
 interface PaymentOptionsProps {
   courseTitle: string;
   price: number;
-  onPaymentComplete: () => void;
+  courseId: string;
+  onPaymentComplete: (courseId: string) => void;
 }
 
-export const PaymentOptions = ({ courseTitle, price, onPaymentComplete }: PaymentOptionsProps) => {
+export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete }: PaymentOptionsProps) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const phoneNumber = "9618762894";
+
+  useEffect(() => {
+    // Check if user is already enrolled
+    const checkEnrollment = async () => {
+      setIsChecking(true);
+      const { enrolled } = await checkCourseEnrollment(courseId);
+      setIsEnrolled(enrolled);
+      setIsChecking(false);
+    };
+    
+    checkEnrollment();
+  }, [courseId]);
 
   const handleCopyNumber = () => {
     navigator.clipboard.writeText(phoneNumber);
@@ -24,14 +41,59 @@ export const PaymentOptions = ({ courseTitle, price, onPaymentComplete }: Paymen
     toast.success("Phone number copied to clipboard");
   };
 
-  const handlePaymentSimulation = () => {
+  const handlePaymentSimulation = async (paymentMethod: string) => {
+    setIsLoading(true);
     toast.success("Processing payment...");
-    setTimeout(() => {
-      setOpen(false);
-      onPaymentComplete();
-      toast.success("Payment successful!");
-    }, 2000);
+    
+    try {
+      const result = await simulatePayment(courseId, paymentMethod);
+      
+      if (result.success) {
+        if (result.alreadyEnrolled) {
+          toast.info("You are already enrolled in this course");
+          setOpen(false);
+          setIsEnrolled(true);
+        } else {
+          setTimeout(() => {
+            setOpen(false);
+            onPaymentComplete(courseId);
+            toast.success("Payment successful! You now have access to the course.");
+            setIsEnrolled(true);
+          }, 1500);
+        }
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Payment processing failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  // If already enrolled, show direct access button
+  if (isEnrolled) {
+    return (
+      <Button 
+        className="w-full" 
+        size="lg" 
+        onClick={() => onPaymentComplete(courseId)}
+      >
+        Access Course
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </Button>
+    );
+  }
+
+  // Show loading state while checking enrollment
+  if (isChecking) {
+    return (
+      <Button className="w-full" size="lg" disabled>
+        <span className="animate-pulse">Checking access...</span>
+      </Button>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -68,9 +130,24 @@ export const PaymentOptions = ({ courseTitle, price, onPaymentComplete }: Paymen
               <div className="text-center">
                 <p className="text-sm text-muted-foreground mb-1">Scan using any UPI app:</p>
                 <div className="flex justify-center space-x-4">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/PhonePe_logo.png/800px-PhonePe_logo.png" alt="PhonePe" className="h-8 w-8 object-contain" />
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Google_Pay_logo.svg/1200px-Google_Pay_logo.svg.png" alt="Google Pay" className="h-8 w-8 object-contain" />
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png" alt="Paytm" className="h-8 w-8 object-contain" />
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/PhonePe_logo.png/800px-PhonePe_logo.png" 
+                    alt="PhonePe" 
+                    className="h-8 w-8 object-contain"
+                    title="PhonePe"
+                  />
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Google_Pay_logo.svg/1200px-Google_Pay_logo.svg.png" 
+                    alt="Google Pay" 
+                    className="h-8 w-8 object-contain" 
+                    title="Google Pay"
+                  />
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png" 
+                    alt="Paytm" 
+                    className="h-8 w-8 object-contain"
+                    title="Paytm" 
+                  />
                 </div>
               </div>
               
@@ -86,8 +163,12 @@ export const PaymentOptions = ({ courseTitle, price, onPaymentComplete }: Paymen
                 </Button>
               </div>
               
-              <Button onClick={handlePaymentSimulation} className="w-full">
-                I've Completed the Payment
+              <Button 
+                onClick={() => handlePaymentSimulation('upi')} 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : "I've Completed the Payment"}
               </Button>
             </div>
           </TabsContent>
@@ -132,8 +213,12 @@ export const PaymentOptions = ({ courseTitle, price, onPaymentComplete }: Paymen
                 </div>
               </div>
               
-              <Button onClick={handlePaymentSimulation} className="w-full">
-                Pay ${price}
+              <Button 
+                onClick={() => handlePaymentSimulation('card')} 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : `Pay $${price}`}
               </Button>
               
               <div className="text-center text-xs text-muted-foreground mt-2">

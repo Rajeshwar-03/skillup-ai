@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft } from "lucide-react";
+import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentOptions } from "@/components/PaymentOptions";
+import { checkCourseEnrollment } from "@/services/chatService";
 
 type CourseType = {
   title: string;
@@ -483,15 +484,28 @@ const CourseDetails = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
   const [showDemoVideo, setShowDemoVideo] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const course = courseData[courseId as keyof typeof courseData];
   const shouldPromptEnroll = new URLSearchParams(location.search).get('enroll') === 'true';
 
   useEffect(() => {
-    if (shouldPromptEnroll && course && course.price > 0) {
+    const checkUserEnrollment = async () => {
+      if (courseId) {
+        const { enrolled } = await checkCourseEnrollment(courseId);
+        setIsEnrolled(enrolled);
+        setIsLoading(false);
+      }
+    };
+    
+    checkUserEnrollment();
+  }, [courseId]);
+
+  useEffect(() => {
+    if (shouldPromptEnroll && course && course.price > 0 && !isEnrolled) {
       handlePayment();
     }
-  }, [shouldPromptEnroll, course]);
+  }, [shouldPromptEnroll, course, isEnrolled]);
 
   if (!course) {
     return <div>Course not found</div>;
@@ -504,6 +518,15 @@ const CourseDetails = () => {
       
       if (!user) {
         toast.error("Please sign in to purchase courses");
+        setProcessingPayment(false);
+        return;
+      }
+
+      const { enrolled } = await checkCourseEnrollment(courseId as string);
+      
+      if (enrolled) {
+        toast.info("You are already enrolled in this course");
+        setIsEnrolled(true);
         setProcessingPayment(false);
         return;
       }
@@ -523,9 +546,6 @@ const CourseDetails = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to create payment');
       }
-
-      const data = await response.json();
-      setClientSecret(data.clientSecret);
 
       setTimeout(() => {
         completeEnrollment();
@@ -547,6 +567,15 @@ const CourseDetails = () => {
         return;
       }
 
+      const { enrolled } = await checkCourseEnrollment(courseId as string);
+      
+      if (enrolled) {
+        toast.info("You are already enrolled in this course");
+        setIsEnrolled(true);
+        setProcessingPayment(false);
+        return;
+      }
+
       const { error } = await supabase
         .from('course_enrollments')
         .insert([
@@ -560,12 +589,13 @@ const CourseDetails = () => {
       if (error) throw error;
       
       toast.success("Payment successful! You are now enrolled in the course.");
+      setIsEnrolled(true);
       setProcessingPayment(false);
-      navigate(`/course/${courseId}`);
     } catch (error: any) {
       console.error("Error enrolling after payment:", error);
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
+        setIsEnrolled(true);
       } else {
         toast.error("Enrollment failed. Please contact support.");
       }
@@ -587,15 +617,11 @@ const CourseDetails = () => {
         return;
       }
 
-      const { data: existingEnrollment } = await supabase
-        .from('course_enrollments')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('course_id', courseId)
-        .single();
-
-      if (existingEnrollment) {
+      const { enrolled } = await checkCourseEnrollment(courseId as string);
+      
+      if (enrolled) {
         toast.info("You are already enrolled in this course");
+        setIsEnrolled(true);
         return;
       }
 
@@ -612,10 +638,12 @@ const CourseDetails = () => {
       if (error) throw error;
       
       toast.success("Successfully enrolled! Check your email for next steps.");
+      setIsEnrolled(true);
     } catch (error: any) {
       console.error("Error enrolling in course:", error);
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
+        setIsEnrolled(true);
       } else {
         toast.error("Failed to enroll in course. Please try again.");
       }
@@ -627,16 +655,19 @@ const CourseDetails = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        await supabase
+        const { error } = await supabase
           .from('course_enrollments')
-          .insert([
+          .upsert([
             { 
               course_id: courseId,
               status: 'demo_viewed',
               user_id: user.id
             }
-          ])
-          .match({ user_id: user.id, course_id: courseId, status: 'demo_viewed' });
+          ], { onConflict: 'user_id, course_id' });
+          
+        if (error && error.code !== '23505') {
+          console.error("Error logging demo view:", error);
+        }
       }
       
       setShowDemoVideo(true);
@@ -648,6 +679,17 @@ const CourseDetails = () => {
   const handleDownload = () => {
     toast.success("Materials downloading...");
   };
+
+  const fixedLiveSessionSchedule = course.liveSessionSchedule.map(session => {
+    if ('name' in session && !('topic' in session)) {
+      return {
+        topic: session.name as unknown as string,
+        day: session.day,
+        time: session.time
+      };
+    }
+    return session;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3]">
@@ -831,7 +873,7 @@ const CourseDetails = () => {
                 <div className="glass rounded-2xl p-6">
                   <h2 className="text-2xl font-semibold mb-4">Live Sessions Schedule</h2>
                   <div className="space-y-4">
-                    {course.liveSessionSchedule.map((session, index) => (
+                    {fixedLiveSessionSchedule.map((session, index) => (
                       <div key={index} className="glass rounded-xl p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <Calendar className="w-5 h-5 text-primary" />
@@ -862,16 +904,30 @@ const CourseDetails = () => {
               </div>
               
               <div className="space-y-4">
-                {processingPayment ? (
+                {isLoading ? (
+                  <Button className="w-full" size="lg" disabled>
+                    <span className="animate-pulse">Checking enrollment...</span>
+                  </Button>
+                ) : processingPayment ? (
                   <Button className="w-full" size="lg" disabled>
                     <span className="animate-pulse">Processing Payment...</span>
+                  </Button>
+                ) : isEnrolled ? (
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => navigate(`/course/${courseId}`)}
+                  >
+                    Access Course
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
                   course.price > 0 ? (
                     <PaymentOptions 
                       courseTitle={course.title}
                       price={course.price}
-                      onPaymentComplete={completeEnrollment}
+                      courseId={courseId as string}
+                      onPaymentComplete={() => navigate(`/course/${courseId}`)}
                     />
                   ) : (
                     <Button className="w-full" size="lg" onClick={handleEnroll}>
