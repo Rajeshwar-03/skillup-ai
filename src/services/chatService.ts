@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -97,7 +98,7 @@ export const checkCourseEnrollment = async (courseId: string) => {
   }
 };
 
-// Enhanced payment simulation function with better verification
+// Enhanced payment simulation function with better verification and automatic course access
 export const simulatePayment = async (courseId: string, paymentMethod: string) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();

@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft, ArrowRight } from "lucide-react";
@@ -529,6 +528,7 @@ const CourseDetails = () => {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
         setProcessingPayment(false);
+        navigate(`/course/${courseId}`);
         return;
       }
 
@@ -574,6 +574,7 @@ const CourseDetails = () => {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
         setProcessingPayment(false);
+        navigate(`/course/${courseId}`);
         return;
       }
 
@@ -592,11 +593,13 @@ const CourseDetails = () => {
       toast.success("Payment successful! You are now enrolled in the course.");
       setIsEnrolled(true);
       setProcessingPayment(false);
+      navigate(`/course/${courseId}`);
     } catch (error: any) {
       console.error("Error enrolling after payment:", error);
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
+        navigate(`/course/${courseId}`);
       } else {
         toast.error("Enrollment failed. Please contact support.");
       }
@@ -623,6 +626,7 @@ const CourseDetails = () => {
       if (enrolled) {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
+        navigate(`/course/${courseId}`);
         return;
       }
 
@@ -640,11 +644,13 @@ const CourseDetails = () => {
       
       toast.success("Successfully enrolled! Check your email for next steps.");
       setIsEnrolled(true);
+      navigate(`/course/${courseId}`);
     } catch (error: any) {
       console.error("Error enrolling in course:", error);
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
+        navigate(`/course/${courseId}`);
       } else {
         toast.error("Failed to enroll in course. Please try again.");
       }
@@ -681,17 +687,19 @@ const CourseDetails = () => {
     toast.success("Materials downloading...");
   };
 
-  // Fix the liveSessionSchedule type issues
   const fixedLiveSessionSchedule = course.liveSessionSchedule.map(session => {
-    // Check if the session has 'name' property instead of 'topic'
-    if ('name' in session && !('topic' in session)) {
+    if ('name' in session && typeof session.name === 'string') {
       return {
-        topic: session.name as unknown as string,
-        day: session.day,
-        time: session.time
+        topic: session.name,
+        day: session.day as string,
+        time: session.time as string
       };
     }
-    return session;
+    return session as {
+      topic: string;
+      day: string;
+      time: string;
+    };
   });
 
   return (

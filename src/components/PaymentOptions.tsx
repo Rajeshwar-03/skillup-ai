@@ -30,10 +30,15 @@ export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete
       const { enrolled } = await checkCourseEnrollment(courseId);
       setIsEnrolled(enrolled);
       setIsChecking(false);
+      
+      // If already enrolled, redirect to course access
+      if (enrolled) {
+        onPaymentComplete(courseId);
+      }
     };
     
     checkEnrollment();
-  }, [courseId]);
+  }, [courseId, onPaymentComplete]);
 
   const handleCopyNumber = () => {
     navigator.clipboard.writeText(phoneNumber);
@@ -54,12 +59,13 @@ export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete
           toast.info("You are already enrolled in this course");
           setOpen(false);
           setIsEnrolled(true);
+          onPaymentComplete(courseId);
         } else {
           setTimeout(() => {
             setOpen(false);
-            onPaymentComplete(courseId);
             toast.success("Payment successful! You now have access to the course.");
             setIsEnrolled(true);
+            onPaymentComplete(courseId);
           }, 1500);
         }
       } else {
