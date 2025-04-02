@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { ChatMessage as ChatMessageComponent } from "./chat/ChatMessage";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatMessage, saveChatMessage, sendChatRequest } from "@/services/chatService";
-import { APIKeyManager } from "./APIKeyManager";
 
 export const AIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -15,7 +14,6 @@ export const AIChat = () => {
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [userApiKey, setUserApiKey] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -31,14 +29,6 @@ export const AIChat = () => {
     const timeoutId = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timeoutId);
   }, [messages]);
-
-  // Load API key on mount
-  useEffect(() => {
-    const savedKey = localStorage.getItem("user_openai_api_key");
-    if (savedKey) {
-      setUserApiKey(savedKey);
-    }
-  }, []);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim() || isLoading) return;
@@ -78,10 +68,6 @@ export const AIChat = () => {
     }
   };
 
-  const handleApiKeySave = (apiKey: string) => {
-    setUserApiKey(apiKey);
-  };
-
   return (
     <section id="chat" className="py-24 relative overflow-hidden">
       <div className="container mx-auto px-4">
@@ -104,8 +90,6 @@ export const AIChat = () => {
             viewport={{ once: true }}
             className="glass rounded-2xl p-6"
           >
-            <APIKeyManager onSave={handleApiKeySave} />
-            
             <div className="flex flex-col h-[400px]">
               <div 
                 ref={messagesContainerRef} 

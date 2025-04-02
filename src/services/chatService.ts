@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -35,13 +34,9 @@ export const saveChatMessage = async (message: string, isAssistant: boolean) => 
 
 export const sendChatRequest = async (messages: ChatMessage[]) => {
   try {
-    // Get user provided API key if available
-    const userApiKey = localStorage.getItem("user_openai_api_key");
-    
     const { data, error } = await supabase.functions.invoke("chat", {
       body: { 
-        messages: messages.map(m => ({ role: m.role, content: m.content })),
-        userApiKey: userApiKey || null,  // Pass the user API key to the edge function
+        messages: messages.map(m => ({ role: m.role, content: m.content }))
       }
     });
 
@@ -51,7 +46,7 @@ export const sendChatRequest = async (messages: ChatMessage[]) => {
       if (error.message?.includes('quota') || error.message?.includes('rate limit')) {
         return { 
           success: true, 
-          message: "I'm currently experiencing high demand. Please try again in a few moments or add your own OpenAI API key for faster responses."
+          message: "I'm currently experiencing high demand. Please try again in a few moments."
         };
       }
       throw error;
@@ -66,7 +61,7 @@ export const sendChatRequest = async (messages: ChatMessage[]) => {
     // Return a fallback message instead of showing an error toast
     return { 
       success: true, 
-      message: "I'm currently experiencing technical difficulties. Please try again later or add your own OpenAI API key." 
+      message: "I'm currently experiencing technical difficulties. Please try again later." 
     };
   }
 };
