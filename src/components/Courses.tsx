@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { BookOpen, Video, MessageSquare, Trophy, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PaymentOptions } from "./PaymentOptions";
 import { useState, useEffect } from "react";
 import { checkCourseEnrollment } from "@/services/chatService";
+import { Button } from "@/components/ui/button";
 
 const courses = [
   {
@@ -181,7 +181,6 @@ export const Courses = () => {
   const [enrollmentStatus, setEnrollmentStatus] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check enrollment status for all courses
   useEffect(() => {
     const checkAllEnrollments = async () => {
       try {
@@ -248,7 +247,6 @@ export const Courses = () => {
         return;
       }
 
-      // For free courses, enroll directly
       if (course.price === 0) {
         const { data: existingEnrollment } = await supabase
           .from('course_enrollments')
@@ -279,12 +277,10 @@ export const Courses = () => {
         setEnrollmentStatus(prev => ({...prev, [course.path]: true}));
         navigate(`/course/${course.path}`);
       } else {
-        // For paid courses, navigate to course details page
         navigate(`/course/${course.path}?enroll=true`);
       }
     } catch (error: any) {
       console.error("Error enrolling in course:", error);
-      // Handle duplicate enrollment error specifically
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
         setEnrollmentStatus(prev => ({...prev, [course.path]: true}));
