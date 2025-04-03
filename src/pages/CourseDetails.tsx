@@ -443,7 +443,7 @@ const courseData: Record<string, CourseType> = {
     ],
     liveSessionSchedule: [
       { topic: "Kubernetes for Beginners", day: "Monday", time: "10:00 AM" },
-      { topic: "Microservices Best Practices", day: "Wednesday", time: "2:00 PM" },
+      { name: "Microservices Best Practices", day: "Wednesday", time: "2:00 PM" },
     ],
   },
   "data-engineering": {
@@ -688,17 +688,19 @@ const CourseDetails = () => {
   };
 
   const fixedLiveSessionSchedule = course.liveSessionSchedule.map(session => {
-    if ('name' in session && typeof session.name === 'string') {
+    if ('topic' in session) {
+      return session;
+    } else if ('name' in session && typeof session.name === 'string') {
       return {
         topic: session.name,
         day: session.day as string,
         time: session.time as string
       };
     }
-    return session as {
-      topic: string;
-      day: string;
-      time: string;
+    return {
+      topic: "Session",
+      day: session.day as string,
+      time: session.time as string
     };
   });
 
