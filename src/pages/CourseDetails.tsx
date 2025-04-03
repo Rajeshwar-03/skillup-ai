@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentOptions } from "@/components/PaymentOptions";
 import { checkCourseEnrollment } from "@/services/chatService";
+import { CourseReviewForm } from "@/components/reviews/CourseReviewForm";
 
 interface LiveSession {
   topic: string;
@@ -490,6 +491,13 @@ const CourseDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const course = courseData[courseId as keyof typeof courseData];
   const shouldPromptEnroll = new URLSearchParams(location.search).get('enroll') === 'true';
+  const [courseReviews, setCourseReviews] = useState<{ name: string; rating: number; comment: string; }[]>([]);
+
+  useEffect(() => {
+    if (course) {
+      setCourseReviews(course.reviews);
+    }
+  }, [course]);
 
   useEffect(() => {
     const checkUserEnrollment = async () => {
@@ -512,6 +520,10 @@ const CourseDetails = () => {
   if (!course) {
     return <div>Course not found</div>;
   }
+
+  const handleSubmitReview = (review: { name: string; rating: number; comment: string; }) => {
+    setCourseReviews(prevReviews => [review, ...prevReviews]);
+  };
 
   const handlePayment = async () => {
     try {
@@ -687,7 +699,7 @@ const CourseDetails = () => {
       return session as LiveSession;
     } 
     return {
-      topic: (session as any).name || "Session",
+      topic: (session as any).name || (session as any).topic || "Session",
       day: (session as any).day || "",
       time: (session as any).time || ""
     };
@@ -841,8 +853,14 @@ const CourseDetails = () => {
               {selectedTab === "reviews" && (
                 <div className="glass rounded-2xl p-6">
                   <h2 className="text-2xl font-semibold mb-4">Student Reviews</h2>
+                  
+                  <CourseReviewForm 
+                    courseId={courseId as string} 
+                    onSubmitReview={handleSubmitReview} 
+                  />
+                  
                   <div className="space-y-4">
-                    {course.reviews.map((review, index) => (
+                    {courseReviews.map((review, index) => (
                       <div key={index} className="glass rounded-xl p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
