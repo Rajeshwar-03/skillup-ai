@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CreditCard } from "lucide-react";
+import { ArrowRight, CreditCard, BookOpen } from "lucide-react";
 
 interface PaymentButtonProps {
   isEnrolled: boolean;

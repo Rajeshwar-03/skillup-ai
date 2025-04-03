@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft, ArrowRight } from "lucide-react";
+import { Book, Clock, Trophy, Users, Star, PlayCircle, MessageSquare, Download, Calendar, CheckCircle, Video, FileText, ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
