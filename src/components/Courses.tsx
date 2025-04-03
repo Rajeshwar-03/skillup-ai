@@ -1,9 +1,12 @@
+
 import { motion } from "framer-motion";
 import { BookOpen, Video, MessageSquare, Trophy, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentOptions } from "./PaymentOptions";
+import { useState, useEffect } from "react";
+import { checkCourseEnrollment } from "@/services/chatService";
 
 const courses = [
   {
@@ -175,6 +178,37 @@ const courses = [
 
 export const Courses = () => {
   const navigate = useNavigate();
+  const [enrollmentStatus, setEnrollmentStatus] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check enrollment status for all courses
+  useEffect(() => {
+    const checkAllEnrollments = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        const statuses: Record<string, boolean> = {};
+        
+        for (const course of courses) {
+          const { enrolled } = await checkCourseEnrollment(course.path);
+          statuses[course.path] = enrolled;
+        }
+        
+        setEnrollmentStatus(statuses);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error checking enrollments:", error);
+        setIsLoading(false);
+      }
+    };
+    
+    checkAllEnrollments();
+  }, []);
 
   const handleWatchDemo = async (course: typeof courses[0]) => {
     try {
@@ -242,6 +276,7 @@ export const Courses = () => {
         if (error) throw error;
         
         toast.success("Successfully enrolled in the course!");
+        setEnrollmentStatus(prev => ({...prev, [course.path]: true}));
         navigate(`/course/${course.path}`);
       } else {
         // For paid courses, navigate to course details page
@@ -252,6 +287,7 @@ export const Courses = () => {
       // Handle duplicate enrollment error specifically
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
+        setEnrollmentStatus(prev => ({...prev, [course.path]: true}));
         navigate(`/course/${course.path}`);
       } else {
         toast.error("Failed to enroll in course. Please try again.");
@@ -260,36 +296,8 @@ export const Courses = () => {
   };
 
   const completeEnrollment = async (courseId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error("Please sign in to enroll in courses");
-        return;
-      }
-
-      const { error } = await supabase
-        .from('course_enrollments')
-        .insert([
-          { 
-            course_id: courseId,
-            status: 'enrolled',
-            user_id: user.id
-          }
-        ]);
-
-      if (error) throw error;
-      
-      toast.success("Payment successful! You are now enrolled in the course.");
-      navigate(`/course/${courseId}`);
-    } catch (error: any) {
-      console.error("Error enrolling after payment:", error);
-      if (error.code === '23505') {
-        toast.info("You are already enrolled in this course");
-      } else {
-        toast.error("Enrollment failed. Please contact support.");
-      }
-    }
+    setEnrollmentStatus(prev => ({...prev, [courseId]: true}));
+    navigate(`/course/${courseId}`);
   };
 
   return (
@@ -352,20 +360,33 @@ export const Courses = () => {
                     {course.price === 0 ? "Free" : `$${course.price}`}
                   </span>
                 </div>
-                {course.price === 0 ? (
-                  <button
+                
+                {isLoading ? (
+                  <Button className="w-full" disabled>
+                    <span className="animate-pulse">Checking access...</span>
+                  </Button>
+                ) : enrollmentStatus[course.path] ? (
+                  <Button
+                    onClick={() => navigate(`/course/${course.path}`)}
+                    className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Access Course
+                  </Button>
+                ) : course.price === 0 ? (
+                  <Button
                     onClick={() => handleEnroll(course)}
                     className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
                     <BookOpen className="w-4 h-4" />
                     Enroll Now
-                  </button>
+                  </Button>
                 ) : (
                   <PaymentOptions
                     courseTitle={course.title}
                     price={course.price}
                     courseId={course.path}
-                    onPaymentComplete={(courseId) => completeEnrollment(courseId)}
+                    onPaymentComplete={completeEnrollment}
                   />
                 )}
               </div>
