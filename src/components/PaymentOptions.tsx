@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { Dialog } from "@/components/ui/dialog";
 import { DialogTrigger } from "@/components/ui/dialog";
 import { simulatePayment, checkCourseEnrollment } from "@/services/chatService";
 import { toast } from "sonner";
@@ -70,27 +71,29 @@ export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete
 
   return (
     <>
-      <DialogTrigger asChild>
-        <div>
-          <PaymentButton 
-            isEnrolled={isEnrolled}
-            isChecking={isChecking}
-            price={price}
-            courseId={courseId}
-            onAccessCourse={onPaymentComplete}
-            onClick={() => setOpen(true)}
-          />
-        </div>
-      </DialogTrigger>
-      
-      <PaymentModal 
-        open={open}
-        onOpenChange={setOpen}
-        courseTitle={courseTitle}
-        price={price}
-        onPaymentComplete={handlePaymentSimulation}
-        isLoading={isLoading}
-      />
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <div>
+            <PaymentButton 
+              isEnrolled={isEnrolled}
+              isChecking={isChecking}
+              price={price}
+              courseId={courseId}
+              onAccessCourse={onPaymentComplete}
+              onClick={() => setOpen(true)}
+            />
+          </div>
+        </DialogTrigger>
+        
+        <PaymentModal 
+          open={open}
+          onOpenChange={setOpen}
+          courseTitle={courseTitle}
+          price={price}
+          onPaymentComplete={handlePaymentSimulation}
+          isLoading={isLoading}
+        />
+      </Dialog>
     </>
   );
 };
