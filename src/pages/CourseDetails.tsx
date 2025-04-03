@@ -10,6 +10,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { PaymentOptions } from "@/components/PaymentOptions";
 import { checkCourseEnrollment } from "@/services/chatService";
 
+interface LiveSession {
+  topic: string;
+  day: string;
+  time: string;
+}
+
 type CourseType = {
   title: string;
   description: string;
@@ -32,11 +38,7 @@ type CourseType = {
     rating: number;
     comment: string;
   }>;
-  liveSessionSchedule: Array<{
-    topic: string;
-    day: string;
-    time: string;
-  }>;
+  liveSessionSchedule: LiveSession[];
 };
 
 const courseData: Record<string, CourseType> = {
@@ -528,7 +530,6 @@ const CourseDetails = () => {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
         setProcessingPayment(false);
-        navigate(`/course/${courseId}`);
         return;
       }
 
@@ -574,7 +575,6 @@ const CourseDetails = () => {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
         setProcessingPayment(false);
-        navigate(`/course/${courseId}`);
         return;
       }
 
@@ -593,13 +593,11 @@ const CourseDetails = () => {
       toast.success("Payment successful! You are now enrolled in the course.");
       setIsEnrolled(true);
       setProcessingPayment(false);
-      navigate(`/course/${courseId}`);
     } catch (error: any) {
       console.error("Error enrolling after payment:", error);
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
-        navigate(`/course/${courseId}`);
       } else {
         toast.error("Enrollment failed. Please contact support.");
       }
@@ -626,7 +624,6 @@ const CourseDetails = () => {
       if (enrolled) {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
-        navigate(`/course/${courseId}`);
         return;
       }
 
@@ -644,13 +641,11 @@ const CourseDetails = () => {
       
       toast.success("Successfully enrolled! Check your email for next steps.");
       setIsEnrolled(true);
-      navigate(`/course/${courseId}`);
     } catch (error: any) {
       console.error("Error enrolling in course:", error);
       if (error.code === '23505') {
         toast.info("You are already enrolled in this course");
         setIsEnrolled(true);
-        navigate(`/course/${courseId}`);
       } else {
         toast.error("Failed to enroll in course. Please try again.");
       }
@@ -689,18 +684,12 @@ const CourseDetails = () => {
 
   const fixedLiveSessionSchedule = course.liveSessionSchedule.map(session => {
     if ('topic' in session) {
-      return session;
-    } else if ('name' in session && typeof session.name === 'string') {
-      return {
-        topic: session.name,
-        day: session.day as string,
-        time: session.time as string
-      };
-    }
+      return session as LiveSession;
+    } 
     return {
-      topic: "Session",
-      day: session.day as string,
-      time: session.time as string
+      topic: (session as any).name || "Session",
+      day: (session as any).day || "",
+      time: (session as any).time || ""
     };
   });
 
@@ -925,29 +914,34 @@ const CourseDetails = () => {
                   <Button className="w-full" size="lg" disabled>
                     <span className="animate-pulse">Processing Payment...</span>
                   </Button>
-                ) : isEnrolled ? (
-                  <Button 
-                    className="w-full" 
-                    size="lg"
-                    onClick={() => navigate(`/course/${courseId}`)}
-                  >
-                    Access Course
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
                 ) : (
-                  course.price > 0 ? (
-                    <PaymentOptions 
-                      courseTitle={course.title}
-                      price={course.price}
-                      courseId={courseId as string}
-                      onPaymentComplete={() => navigate(`/course/${courseId}`)}
-                    />
-                  ) : (
-                    <Button className="w-full" size="lg" onClick={handleEnroll}>
-                      <PlayCircle className="mr-2" />
-                      Enroll Now (Free)
-                    </Button>
-                  )
+                  <>
+                    {isEnrolled ? (
+                      <Button
+                        className="w-full bg-primary text-white"
+                        size="lg"
+                        onClick={() => toast.success("You're already enrolled in this course!")}
+                      >
+                        <BookOpen className="mr-2" />
+                        Already Enrolled
+                      </Button>
+                    ) : (
+                      course.price > 0 ? (
+                        <PaymentOptions 
+                          courseTitle={course.title}
+                          price={course.price}
+                          courseId={courseId as string}
+                          onPaymentComplete={() => setIsEnrolled(true)}
+                          showAccessButton={false}
+                        />
+                      ) : (
+                        <Button className="w-full" size="lg" onClick={handleEnroll}>
+                          <PlayCircle className="mr-2" />
+                          Enroll Now (Free)
+                        </Button>
+                      )
+                    )}
+                  </>
                 )}
                 
                 <Button variant="outline" className="w-full" size="lg" onClick={handleWatchDemo}>

@@ -12,9 +12,16 @@ export interface PaymentOptionsProps {
   price: number;
   courseId: string;
   onPaymentComplete: (courseId: string) => void;
+  showAccessButton?: boolean;
 }
 
-export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete }: PaymentOptionsProps) => {
+export const PaymentOptions = ({ 
+  courseTitle, 
+  price, 
+  courseId, 
+  onPaymentComplete,
+  showAccessButton = false
+}: PaymentOptionsProps) => {
   const [open, setOpen] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,14 +35,14 @@ export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete
       setIsEnrolled(enrolled);
       setIsChecking(false);
       
-      // If already enrolled, redirect to course access
-      if (enrolled) {
+      // If already enrolled and showAccessButton is true, redirect to course access
+      if (enrolled && showAccessButton) {
         onPaymentComplete(courseId);
       }
     };
     
     checkEnrollment();
-  }, [courseId, onPaymentComplete]);
+  }, [courseId, onPaymentComplete, showAccessButton]);
 
   const handlePaymentSimulation = async (paymentMethod: string) => {
     setIsLoading(true);
@@ -81,6 +88,7 @@ export const PaymentOptions = ({ courseTitle, price, courseId, onPaymentComplete
               courseId={courseId}
               onAccessCourse={onPaymentComplete}
               onClick={() => setOpen(true)}
+              showAccessButton={showAccessButton}
             />
           </div>
         </DialogTrigger>

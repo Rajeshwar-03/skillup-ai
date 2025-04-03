@@ -9,6 +9,7 @@ interface PaymentButtonProps {
   courseId: string;
   onAccessCourse: (courseId: string) => void;
   onClick?: () => void;
+  showAccessButton?: boolean;
 }
 
 export const PaymentButton = ({
@@ -17,9 +18,10 @@ export const PaymentButton = ({
   price,
   courseId,
   onAccessCourse,
-  onClick
+  onClick,
+  showAccessButton = false
 }: PaymentButtonProps) => {
-  if (isEnrolled) {
+  if (isEnrolled && showAccessButton) {
     return (
       <Button 
         className="w-full" 
@@ -43,7 +45,7 @@ export const PaymentButton = ({
   return (
     <Button className="w-full" size="lg" onClick={onClick}>
       <CreditCard className="mr-2" />
-      Purchase Course (${price})
+      {isEnrolled ? "Purchase Full Access" : `Purchase Course ($${price})`}
     </Button>
   );
 };

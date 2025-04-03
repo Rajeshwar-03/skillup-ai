@@ -38,6 +38,10 @@ export const CourseCard = ({
 }: CourseCardProps) => {
   const navigate = useNavigate();
 
+  const handleViewCourse = () => {
+    navigate(`/course/${course.path}`);
+  };
+
   return (
     <motion.div
       key={index}
@@ -89,11 +93,11 @@ export const CourseCard = ({
           </Button>
         ) : enrollmentStatus[course.path] ? (
           <Button
-            onClick={() => navigate(`/course/${course.path}`)}
+            onClick={handleViewCourse}
             className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
           >
             <BookOpen className="w-4 h-4" />
-            Access Course
+            View Course Details
           </Button>
         ) : course.price === 0 ? (
           <Button
@@ -104,12 +108,13 @@ export const CourseCard = ({
             Enroll Now
           </Button>
         ) : (
-          <PaymentOptions
-            courseTitle={course.title}
-            price={course.price}
-            courseId={course.path}
-            onPaymentComplete={onCompleteEnrollment}
-          />
+          <Button
+            onClick={handleViewCourse}
+            className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+          >
+            <BookOpen className="w-4 h-4" />
+            View Course Details
+          </Button>
         )}
       </div>
     </motion.div>
