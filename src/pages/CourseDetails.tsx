@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Users, MessageSquare, UserCheck, BookOpenCheck, Book, Video } from "lucide-react";
+import { Calendar, Clock, Users, MessageSquare, UserCheck, BookOpenCheck, Book, Video, Download, Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -26,6 +27,11 @@ interface CourseDetailsProps {
       title: string;
       content: string;
       videoUrl?: string;
+      materials?: {
+        name: string;
+        url: string;
+        type: string;
+      }[];
     }[];
   }[];
   price: number;
@@ -59,10 +65,48 @@ const mockCourseDetails: CourseDetailsProps = {
         {
           title: "Setting up your environment",
           content: "Learn how to set up your development environment for React.",
+          videoUrl: "https://example.com/videos/setup-react-env.mp4",
+          materials: [
+            {
+              name: "Environment Setup Guide",
+              url: "https://example.com/materials/react-setup-guide.pdf",
+              type: "PDF"
+            },
+            {
+              name: "React Installation Checklist",
+              url: "https://example.com/materials/react-checklist.docx",
+              type: "DOCX"
+            }
+          ]
         },
         {
           title: "Components and JSX",
           content: "Understand the basics of React components and JSX syntax.",
+          videoUrl: "https://example.com/videos/components-jsx.mp4",
+          materials: [
+            {
+              name: "JSX Cheat Sheet",
+              url: "https://example.com/materials/jsx-cheatsheet.pdf",
+              type: "PDF"
+            },
+            {
+              name: "Component Structure Examples",
+              url: "https://example.com/materials/component-examples.zip",
+              type: "ZIP"
+            }
+          ]
+        },
+        {
+          title: "State and Props",
+          content: "Learn how to manage state and pass props between components.",
+          videoUrl: "https://example.com/videos/state-props.mp4",
+          materials: [
+            {
+              name: "State Management Guide",
+              url: "https://example.com/materials/state-management.pdf",
+              type: "PDF"
+            }
+          ]
         },
       ],
     },
@@ -72,10 +116,43 @@ const mockCourseDetails: CourseDetailsProps = {
         {
           title: "Creating a basic UI",
           content: "Build a simple user interface using React components.",
+          videoUrl: "https://example.com/videos/basic-ui.mp4",
+          materials: [
+            {
+              name: "UI Design Templates",
+              url: "https://example.com/materials/ui-templates.zip",
+              type: "ZIP"
+            }
+          ]
         },
         {
           title: "Handling user input",
           content: "Learn how to handle user input and update the UI.",
+          videoUrl: "https://example.com/videos/user-input.mp4",
+          materials: [
+            {
+              name: "Form Handling Guide",
+              url: "https://example.com/materials/form-handling.pdf",
+              type: "PDF"
+            }
+          ]
+        },
+        {
+          title: "API Integration",
+          content: "Connect your React app to backend APIs.",
+          videoUrl: "https://example.com/videos/api-integration.mp4",
+          materials: [
+            {
+              name: "API Integration Examples",
+              url: "https://example.com/materials/api-examples.zip",
+              type: "ZIP"
+            },
+            {
+              name: "REST API Cheat Sheet",
+              url: "https://example.com/materials/rest-api.pdf",
+              type: "PDF"
+            }
+          ]
         },
       ],
     },
@@ -109,6 +186,7 @@ const CourseDetails = () => {
   const [liveSessions, setLiveSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [accessGranted, setAccessGranted] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch course details and live sessions based on courseId
@@ -147,6 +225,14 @@ const CourseDetails = () => {
     toast.success("Review submitted successfully!");
   };
 
+  const handlePlayVideo = (videoUrl: string) => {
+    setCurrentVideo(videoUrl);
+  };
+
+  const closeVideoPlayer = () => {
+    setCurrentVideo(null);
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -167,7 +253,7 @@ const CourseDetails = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3]">
       <Navigation />
 
-      <main className="container mx-auto px-4 pt-24">
+      <main className="container mx-auto px-4 pt-24 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -217,6 +303,30 @@ const CourseDetails = () => {
           </Card>
         </motion.div>
 
+        {currentVideo && (
+          <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+            <div className="relative w-full max-w-4xl p-4">
+              <Button 
+                variant="ghost" 
+                onClick={closeVideoPlayer} 
+                className="absolute top-0 right-0 text-white bg-black/50 rounded-full p-2 z-10"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+              <div className="bg-black rounded-lg overflow-hidden">
+                <video 
+                  src={currentVideo} 
+                  controls 
+                  autoPlay 
+                  className="w-full max-h-[80vh]"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+          </div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -234,13 +344,65 @@ const CourseDetails = () => {
                   <AccordionItem key={index} value={`module-${index}`}>
                     <AccordionTrigger>{module.title}</AccordionTrigger>
                     <AccordionContent>
-                      <ul className="list-none pl-4 mt-2">
+                      <ul className="list-none pl-4 mt-2 space-y-4">
                         {module.lessons.map((lesson, lessonIndex) => (
-                          <li key={lessonIndex} className="mb-2">
-                            <div className="flex items-center gap-2">
-                              {lesson.videoUrl ? <Video className="h-4 w-4 text-blue-500" /> : <Book className="h-4 w-4 text-gray-500" />}
-                              <span>{lesson.title}</span>
+                          <li key={lessonIndex} className="border-b pb-4 last:border-b-0">
+                            <div className="flex items-start gap-2 mb-2">
+                              {lesson.videoUrl ? <Video className="h-4 w-4 mt-1 text-blue-500" /> : <Book className="h-4 w-4 mt-1 text-gray-500" />}
+                              <span className="font-medium">{lesson.title}</span>
                             </div>
+                            <p className="text-sm text-muted-foreground ml-6 mb-3">{lesson.content}</p>
+                            
+                            {lesson.videoUrl && (
+                              <div className="flex ml-6 mb-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="flex items-center gap-1"
+                                  onClick={() => handlePlayVideo(lesson.videoUrl!)}
+                                >
+                                  <Play className="h-3 w-3" /> Watch Video
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="flex items-center gap-1 ml-2"
+                                  onClick={() => {
+                                    // In a real app, you'd implement proper download functionality
+                                    window.open(lesson.videoUrl, '_blank');
+                                    toast.success("Download started");
+                                  }}
+                                >
+                                  <Download className="h-3 w-3" /> Download Video
+                                </Button>
+                              </div>
+                            )}
+                            
+                            {lesson.materials && lesson.materials.length > 0 && (
+                              <div className="ml-6 mt-2">
+                                <p className="text-xs font-semibold text-muted-foreground mb-1">MATERIALS:</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {lesson.materials.map((material, matIndex) => (
+                                    <a 
+                                      key={matIndex}
+                                      href={material.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors bg-background/50 px-3 py-2 rounded-md"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        window.open(material.url, '_blank');
+                                        toast.success(`Downloading ${material.name}`);
+                                      }}
+                                    >
+                                      <Download className="h-3 w-3" />
+                                      <span className="flex-1 truncate">{material.name}</span>
+                                      <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{material.type}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </li>
                         ))}
                       </ul>

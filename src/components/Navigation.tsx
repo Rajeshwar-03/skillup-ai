@@ -48,7 +48,7 @@ export const Navigation = () => {
     <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" : "py-4"}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="font-bold text-xl">LearnWise</span>
+          <span className="font-bold text-xl">SkillUp AI</span>
         </Link>
 
         {/* Desktop Navigation */}
