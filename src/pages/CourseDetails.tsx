@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Users, MessageSquare, UserCheck, BookOpenCheck, Book, Video, Download, Play, X } from "lucide-react";
+import { Calendar, Clock, Users, MessageSquare, UserCheck, BookOpenCheck, Book, Video, Download, Play, X, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +14,7 @@ import { CourseReviewForm } from "@/components/reviews/CourseReviewForm";
 import { CourseReviews } from "@/components/reviews/CourseReviews";
 import { PaymentOptions } from "@/components/PaymentOptions";
 import { Navigation } from "@/components/Navigation";
+import { courseDetailsData } from "@/data/courseDetailsData";
 
 interface CourseDetailsProps {
   id: string;
@@ -52,118 +53,6 @@ interface LiveSession {
   meetingUrl: string;
 }
 
-const mockCourseDetails: CourseDetailsProps = {
-  id: "course-1",
-  title: "Full Stack Web Development with React",
-  description: "Learn to build modern web applications using React, Node.js, and MongoDB.",
-  instructor: "John Doe",
-  duration: 60,
-  modules: [
-    {
-      title: "Introduction to React",
-      lessons: [
-        {
-          title: "Setting up your environment",
-          content: "Learn how to set up your development environment for React.",
-          videoUrl: "https://example.com/videos/setup-react-env.mp4",
-          materials: [
-            {
-              name: "Environment Setup Guide",
-              url: "https://example.com/materials/react-setup-guide.pdf",
-              type: "PDF"
-            },
-            {
-              name: "React Installation Checklist",
-              url: "https://example.com/materials/react-checklist.docx",
-              type: "DOCX"
-            }
-          ]
-        },
-        {
-          title: "Components and JSX",
-          content: "Understand the basics of React components and JSX syntax.",
-          videoUrl: "https://example.com/videos/components-jsx.mp4",
-          materials: [
-            {
-              name: "JSX Cheat Sheet",
-              url: "https://example.com/materials/jsx-cheatsheet.pdf",
-              type: "PDF"
-            },
-            {
-              name: "Component Structure Examples",
-              url: "https://example.com/materials/component-examples.zip",
-              type: "ZIP"
-            }
-          ]
-        },
-        {
-          title: "State and Props",
-          content: "Learn how to manage state and pass props between components.",
-          videoUrl: "https://example.com/videos/state-props.mp4",
-          materials: [
-            {
-              name: "State Management Guide",
-              url: "https://example.com/materials/state-management.pdf",
-              type: "PDF"
-            }
-          ]
-        },
-      ],
-    },
-    {
-      title: "Building a React App",
-      lessons: [
-        {
-          title: "Creating a basic UI",
-          content: "Build a simple user interface using React components.",
-          videoUrl: "https://example.com/videos/basic-ui.mp4",
-          materials: [
-            {
-              name: "UI Design Templates",
-              url: "https://example.com/materials/ui-templates.zip",
-              type: "ZIP"
-            }
-          ]
-        },
-        {
-          title: "Handling user input",
-          content: "Learn how to handle user input and update the UI.",
-          videoUrl: "https://example.com/videos/user-input.mp4",
-          materials: [
-            {
-              name: "Form Handling Guide",
-              url: "https://example.com/materials/form-handling.pdf",
-              type: "PDF"
-            }
-          ]
-        },
-        {
-          title: "API Integration",
-          content: "Connect your React app to backend APIs.",
-          videoUrl: "https://example.com/videos/api-integration.mp4",
-          materials: [
-            {
-              name: "API Integration Examples",
-              url: "https://example.com/materials/api-examples.zip",
-              type: "ZIP"
-            },
-            {
-              name: "REST API Cheat Sheet",
-              url: "https://example.com/materials/rest-api.pdf",
-              type: "PDF"
-            }
-          ]
-        },
-      ],
-    },
-  ],
-  price: 49.99,
-  enrollmentCount: 120,
-  thumbnailUrl: "/placeholder.svg",
-  prerequisites: ["Basic HTML", "CSS", "JavaScript"],
-  tags: ["React", "JavaScript", "Web Development"],
-};
-
 const createMockLiveSessions = (count: number): LiveSession[] => {
   const sessions: LiveSession[] = Array.from({ length: count }, (_, i) => ({
     id: `session-${i + 1}`,
@@ -193,13 +82,16 @@ const CourseDetails = () => {
     const fetchCourseDetails = async () => {
       setLoading(true);
       try {
-        // Mock implementation: Replace with actual data fetching from Supabase
-        // Simulate fetching course details
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-        setCourse(mockCourseDetails);
+        // Get the specific course details based on courseId
+        if (courseId && courseDetailsData[courseId]) {
+          setCourse(courseDetailsData[courseId]);
+        } else {
+          toast.error("Course not found");
+          navigate("/");
+        }
 
         // Simulate fetching live sessions
-        const mockSessions = createMockLiveSessions(3);
+        const mockSessions = createMockLiveSessions(2);
         setLiveSessions(mockSessions);
       } catch (error) {
         console.error("Failed to fetch course details:", error);
@@ -210,7 +102,7 @@ const CourseDetails = () => {
     };
 
     fetchCourseDetails();
-  }, [courseId]);
+  }, [courseId, navigate]);
 
   const handlePaymentComplete = (courseId: string) => {
     // After successful payment, navigate to the course access page
@@ -231,6 +123,10 @@ const CourseDetails = () => {
 
   const closeVideoPlayer = () => {
     setCurrentVideo(null);
+  };
+
+  const handleBackToList = () => {
+    navigate("/");
   };
 
   if (loading) {
@@ -254,6 +150,17 @@ const CourseDetails = () => {
       <Navigation />
 
       <main className="container mx-auto px-4 pt-24 pb-12">
+        <div className="mb-6">
+          <Button 
+            onClick={handleBackToList} 
+            variant="ghost" 
+            className="flex items-center text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Back to courses
+          </Button>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -479,17 +386,31 @@ const CourseDetails = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
-          <Card className="glass">
-            <CardContent className="flex justify-center">
-              <PaymentOptions 
-                courseTitle={course.title}
-                price={course.price}
-                courseId={course.id}
-                onPaymentComplete={handlePaymentComplete}
-                showAccessButton={accessGranted}
-              />
-            </CardContent>
-          </Card>
+          {course.price === 0 ? (
+            <Card className="glass">
+              <CardContent className="flex justify-center p-6">
+                <Button 
+                  size="lg" 
+                  className="w-full max-w-md text-lg"
+                  onClick={() => handlePaymentComplete(course.id)}
+                >
+                  Enroll for Free
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="glass">
+              <CardContent className="flex justify-center">
+                <PaymentOptions 
+                  courseTitle={course.title}
+                  price={course.price}
+                  courseId={course.id}
+                  onPaymentComplete={handlePaymentComplete}
+                  showAccessButton={accessGranted}
+                />
+              </CardContent>
+            </Card>
+          )}
         </motion.div>
       </main>
     </div>

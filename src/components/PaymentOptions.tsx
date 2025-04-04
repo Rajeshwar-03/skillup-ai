@@ -76,6 +76,29 @@ export const PaymentOptions = ({
     }
   };
 
+  const handleFreeEnrollment = () => {
+    toast.success("Enrolling you in this free course...");
+    setTimeout(() => {
+      setIsEnrolled(true);
+      onPaymentComplete(courseId);
+    }, 1000);
+  };
+
+  // For free courses, directly show the Enroll button without dialog
+  if (price === 0) {
+    return (
+      <PaymentButton 
+        isEnrolled={isEnrolled}
+        isChecking={isChecking}
+        price={price}
+        courseId={courseId}
+        onAccessCourse={onPaymentComplete}
+        onClick={handleFreeEnrollment}
+        showAccessButton={showAccessButton}
+      />
+    );
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>

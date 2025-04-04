@@ -42,9 +42,18 @@ export const PaymentButton = ({
     );
   }
 
+  if (price === 0) {
+    return (
+      <Button className="w-full" size="lg" onClick={onClick}>
+        <BookOpen className="mr-2 h-4 w-4" />
+        Enroll Free
+      </Button>
+    );
+  }
+
   return (
     <Button className="w-full" size="lg" onClick={onClick}>
-      <CreditCard className="mr-2" />
+      <CreditCard className="mr-2 h-4 w-4" />
       {isEnrolled ? "Purchase Full Access" : `Purchase Course ($${price})`}
     </Button>
   );
