@@ -2,14 +2,21 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, UserRound } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { 
+  Avatar,
+  AvatarFallback,
+  AvatarImage
+} from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +25,20 @@ export const Navigation = () => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription?.unsubscribe();
   }, []);
 
   const scrollToSection = (sectionId: string) => {
@@ -73,9 +94,20 @@ export const Navigation = () => {
         )}
 
         <div className="flex items-center space-x-4">
-          <Link to="/signup">
-            <Button>Get Started</Button>
-          </Link>
+          {user ? (
+            <Link to="/profile">
+              <Avatar className="cursor-pointer transition-all hover:ring-2 hover:ring-primary">
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-primary text-white">
+                  {user.email?.[0]?.toUpperCase() || <UserRound className="h-5 w-5" />}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+          ) : (
+            <Link to="/signup">
+              <Button>Get Started</Button>
+            </Link>
+          )}
 
           {/* Mobile Menu Button */}
           {isMobile && (
@@ -111,6 +143,24 @@ export const Navigation = () => {
                 {link.name}
               </Link>
             ))}
+            {user ? (
+              <Link 
+                to="/profile"
+                className="text-foreground/70 hover:text-foreground py-2 transition-colors flex items-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <UserRound className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
+            ) : (
+              <Link 
+                to="/signup"
+                className="text-foreground/70 hover:text-foreground py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sign Up
+              </Link>
+            )}
           </div>
         </div>
       )}
