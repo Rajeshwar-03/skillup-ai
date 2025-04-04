@@ -1,165 +1,119 @@
-import { motion } from "framer-motion";
-import { Menu, X, User } from "lucide-react";
+
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Menu, X } from "lucide-react";
+import { useMediaQuery } from "@/hooks/use-mobile";
 
 export const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    // Check initial auth state
-    checkUser();
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        setIsAuthenticated(true);
-      } else if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false);
-        navigate('/signup');
-      }
-    });
-
-    // Cleanup subscription
-    return () => {
-      subscription.unsubscribe();
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
     };
-  }, [navigate]);
 
-  const checkUser = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-      
-      if (!session) {
-        navigate('/signup');
-      }
-    } catch (error: any) {
-      console.error('Error checking auth state:', error);
-      toast.error('Authentication error. Please try logging in again.');
-      navigate('/signup');
-    }
-  };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
-    setIsOpen(false);
+    // Close mobile menu
+    setIsMenuOpen(false);
     
-    // If we're not on the home page, navigate there first
-    if (location.pathname !== '/') {
-      navigate('/', { state: { scrollTo: sectionId } });
+    // If we're not on the homepage, navigate to homepage first with a section hash
+    if (location.pathname !== "/") {
       return;
     }
     
-    // Otherwise scroll to the section directly
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // If we're already on the homepage, scroll to the section
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="fixed top-0 left-0 right-0 z-50 glass"
-    >
-      <div className="container mx-auto px-4">
-        <div className="h-20 flex items-center justify-between">
-          <motion.a
-            href="/"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="text-2xl font-bold gradient-text"
-          >
-            SkillUp AI
-          </motion.a>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            {[
-              { name: "Features", id: "features" },
-              { name: "Courses", id: "courses" },
-              { name: "Community", id: "community" }
-            ].map((item, index) => (
-              <motion.button
-                key={index}
-                onClick={() => scrollToSection(item.id)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-              >
-                {item.name}
-              </motion.button>
-            ))}
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-full"
-                onClick={() => navigate('/profile')}
-              >
-                <Avatar>
-                  <AvatarFallback>
-                    <User className="h-5 w-5" />
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/signup')}
-              >
-                Sign In
-              </Button>
-            )}
-            
-            <button 
-              className="md:hidden"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? <X /> : <Menu />}
-            </button>
-          </div>
+  const navLinks = [
+    { name: "Courses", path: "/", action: () => {} },
+    { name: "Features", path: "#features", action: () => scrollToSection("features") },
+    { name: "Community", path: "#community", action: () => scrollToSection("community") },
+  ];
 
-          <div className={`${isOpen ? 'flex' : 'hidden'} md:hidden absolute top-20 left-0 right-0 flex-col items-center space-y-4 bg-white/90 backdrop-blur-lg p-6 border-t border-white/20`}>
-            {[
-              { name: "Features", id: "features" },
-              { name: "Courses", id: "courses" },
-              { name: "Community", id: "community" }
-            ].map((item, index) => (
-              <motion.button
-                key={index}
-                onClick={() => scrollToSection(item.id)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  return (
+    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" : "py-4"}`}>
+      <div className="container mx-auto px-4 flex justify-between items-center">
+        <Link to="/" className="flex items-center space-x-2">
+          <span className="font-bold text-xl">LearnWise</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <nav className="flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={(e) => {
+                  if (link.path.startsWith('#')) {
+                    e.preventDefault();
+                    link.action();
+                  }
+                }}
+                className="text-foreground/70 hover:text-foreground transition-colors"
               >
-                {item.name}
-              </motion.button>
+                {link.name}
+              </Link>
             ))}
-            {!isAuthenticated && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90"
-                onClick={() => navigate('/signup')}
-              >
-                Sign Up
-              </motion.button>
-            )}
-          </div>
+          </nav>
+        )}
+
+        <div className="flex items-center space-x-4">
+          <Link to="/signup">
+            <Button>Get Started</Button>
+          </Link>
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMenu}
+              aria-label="Toggle Menu"
+            >
+              {isMenuOpen ? <X /> : <Menu />}
+            </Button>
+          )}
         </div>
       </div>
-    </motion.nav>
+
+      {/* Mobile Menu */}
+      {isMobile && isMenuOpen && (
+        <div className="bg-background border-t mt-4 py-4 shadow-lg">
+          <div className="container mx-auto px-4 flex flex-col space-y-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={(e) => {
+                  if (link.path.startsWith('#')) {
+                    e.preventDefault();
+                    link.action();
+                  }
+                  setIsMenuOpen(false);
+                }}
+                className="text-foreground/70 hover:text-foreground py-2 transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </header>
   );
 };

@@ -33,11 +33,12 @@ export const saveChatMessage = async (message: string, isAssistant: boolean) => 
   }
 };
 
-export const sendChatRequest = async (messages: ChatMessage[]) => {
+export const sendChatRequest = async (messages: ChatMessage[], apiKey?: string) => {
   try {
     const { data, error } = await supabase.functions.invoke("chat", {
       body: { 
-        messages: messages.map(m => ({ role: m.role, content: m.content }))
+        messages: messages.map(m => ({ role: m.role, content: m.content })),
+        apiKey
       }
     });
 

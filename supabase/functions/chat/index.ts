@@ -15,8 +15,10 @@ serve(async (req) => {
 
   try {
     const requestData = await req.json();
-    const { messages, action, courseId, courseTitle, price } = requestData;
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const { messages, action, courseId, courseTitle, price, apiKey } = requestData;
+    
+    // Use provided API key or fall back to environment variable
+    const openAIApiKey = apiKey || Deno.env.get('OPENAI_API_KEY');
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
 
     // Add more detailed logging for debugging

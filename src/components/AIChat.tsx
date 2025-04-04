@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ChatMessage as ChatMessageComponent } from "./chat/ChatMessage";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatMessage, saveChatMessage, sendChatRequest } from "@/services/chatService";
+import { APIKeyManager } from "./APIKeyManager";
 
 export const AIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -14,8 +15,19 @@ export const AIChat = () => {
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKey, setApiKey] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Set default API key on first load
+    const defaultApiKey = "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";
+    const savedKey = localStorage.getItem("user_openai_api_key") || defaultApiKey;
+    setApiKey(savedKey);
+    if (!localStorage.getItem("user_openai_api_key")) {
+      localStorage.setItem("user_openai_api_key", defaultApiKey);
+    }
+  }, []);
 
   // Only scroll to bottom when new messages are added, not on initial load
   useEffect(() => {
@@ -47,7 +59,7 @@ export const AIChat = () => {
       }
 
       // Get AI response
-      const response = await sendChatRequest([...messages, userMessage]);
+      const response = await sendChatRequest([...messages, userMessage], apiKey);
       
       if (response.success) {
         const aiResponse = { 
@@ -66,6 +78,10 @@ export const AIChat = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSaveApiKey = (key: string) => {
+    setApiKey(key);
   };
 
   return (
@@ -91,6 +107,8 @@ export const AIChat = () => {
             className="glass rounded-2xl p-6"
           >
             <div className="flex flex-col h-[400px]">
+              <APIKeyManager onSave={handleSaveApiKey} />
+              
               <div 
                 ref={messagesContainerRef} 
                 className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2"
