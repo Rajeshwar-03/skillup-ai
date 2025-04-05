@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Users, MessageSquare, UserCheck, BookOpenCheck, Book, Video, Download, Play, X, ChevronLeft } from "lucide-react";
+import { Calendar, Clock, Users, MessageSquare, UserCheck, BookOpenCheck, Book, Video, Download, Play, X, ChevronLeft, FileVideo, FileAudio, BookAudio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -95,6 +96,7 @@ const CourseDetails = () => {
   const [loading, setLoading] = useState(true);
   const [accessGranted, setAccessGranted] = useState(false);
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
+  const [hasCompletedEnrollment, setHasCompletedEnrollment] = useState(false);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
@@ -114,6 +116,7 @@ const CourseDetails = () => {
               
             if (enrollment) {
               setAccessGranted(true);
+              setHasCompletedEnrollment(true);
             }
           }
         } else {
@@ -137,9 +140,13 @@ const CourseDetails = () => {
   }, [courseId, navigate]);
 
   const handlePaymentComplete = (courseId: string) => {
-    setAccessGranted(true);
-    toast.success("You now have full access to the course!");
-    navigate(`/course/${courseId}`);
+    // Only show toast and redirect if this is the first time completing enrollment
+    if (!hasCompletedEnrollment) {
+      setAccessGranted(true);
+      setHasCompletedEnrollment(true);
+      toast.success("You now have full access to the course!");
+      navigate(`/course/${courseId}`);
+    }
   };
 
   const handleSubmitReview = async (review: {name: string, rating: number, comment: string}) => {
@@ -150,6 +157,20 @@ const CourseDetails = () => {
         toast.error("Please sign in to submit a review");
         return;
       }
+      
+      const { error } = await supabase
+        .from('course_reviews')
+        .insert([
+          {
+            course_id: courseId,
+            user_id: user.id,
+            reviewer_name: review.name,
+            rating: review.rating,
+            comment: review.comment
+          }
+        ]);
+        
+      if (error) throw error;
       
       console.log("New review submitted:", review);
       toast.success("Review submitted successfully!");
@@ -169,6 +190,31 @@ const CourseDetails = () => {
 
   const handleBackToList = () => {
     navigate("/");
+  };
+  
+  const getFileIcon = (type: string) => {
+    switch(type.toLowerCase()) {
+      case 'video':
+        return <FileVideo className="h-4 w-4" />;
+      case 'audio':
+        return <FileAudio className="h-4 w-4" />;
+      case 'pdf':
+        return <Book className="h-4 w-4" />;
+      case 'doc':
+      case 'docx':
+        return <BookAudio className="h-4 w-4" />;
+      default:
+        return <Download className="h-4 w-4" />;
+    }
+  };
+
+  const handleDownload = (item: any, itemType: string) => {
+    const url = itemType === 'video' ? item.videoUrl : item.url;
+    const name = itemType === 'video' ? `${item.title} video` : item.name;
+    
+    // Open in new tab
+    window.open(url, '_blank');
+    toast.success(`Downloading ${name}`);
   };
 
   if (loading) {
@@ -233,6 +279,45 @@ const CourseDetails = () => {
                   <h4 className="font-semibold mb-2">Instructor</h4>
                   <p>{course.instructor}</p>
                 </div>
+                
+                {/* Demo Materials Section */}
+                <div className="mt-4">
+                  <h4 className="font-semibold mb-2">Free Demo Materials</h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {courseId && coursesData.find(c => c.path === courseId)?.materials?.map((material, idx) => (
+                      <Button 
+                        key={idx} 
+                        variant="outline" 
+                        className="flex items-center justify-between text-left"
+                        onClick={() => handleDownload(material, 'material')}
+                      >
+                        <div className="flex items-center">
+                          {getFileIcon(material.type)}
+                          <span className="ml-2 truncate">{material.name}</span>
+                        </div>
+                        <Download className="h-4 w-4 ml-2" />
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Demo Video Button */}
+                {courseId && coursesData.find(c => c.path === courseId)?.demoVideo && (
+                  <div className="mt-4">
+                    <h4 className="font-semibold mb-2">Course Demo Video</h4>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center justify-between w-full"
+                      onClick={() => setCurrentVideo(coursesData.find(c => c.path === courseId)?.demoVideo || '')}
+                    >
+                      <div className="flex items-center">
+                        <Video className="h-4 w-4" />
+                        <span className="ml-2">Watch Course Demo</span>
+                      </div>
+                      <Play className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                )}
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Prerequisites</h4>
@@ -263,14 +348,23 @@ const CourseDetails = () => {
                 <X className="h-5 w-5" />
               </Button>
               <div className="bg-black rounded-lg overflow-hidden">
-                <video 
-                  src={currentVideo} 
-                  controls 
-                  autoPlay 
-                  className="w-full max-h-[80vh]"
-                >
-                  Your browser does not support the video tag.
-                </video>
+                {currentVideo.includes('youtube.com') || currentVideo.includes('youtu.be') ? (
+                  <iframe
+                    src={currentVideo}
+                    className="w-full aspect-video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <video 
+                    src={currentVideo} 
+                    controls 
+                    autoPlay 
+                    className="w-full max-h-[80vh]"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </div>
             </div>
           </div>
@@ -316,10 +410,7 @@ const CourseDetails = () => {
                                   variant="ghost" 
                                   size="sm" 
                                   className="flex items-center gap-1 ml-2"
-                                  onClick={() => {
-                                    window.open(lesson.videoUrl, '_blank');
-                                    toast.success(`Downloading ${lesson.title} video`);
-                                  }}
+                                  onClick={() => handleDownload(lesson, 'video')}
                                 >
                                   <Download className="h-3 w-3" /> Download Video
                                 </Button>
@@ -331,22 +422,19 @@ const CourseDetails = () => {
                                 <p className="text-xs font-semibold text-muted-foreground mb-1">MATERIALS:</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                   {lesson.materials.map((material, matIndex) => (
-                                    <a 
+                                    <Button 
                                       key={matIndex}
-                                      href={material.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors bg-background/50 px-3 py-2 rounded-md"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        window.open(material.url, '_blank');
-                                        toast.success(`Downloading ${material.name}`);
-                                      }}
+                                      variant="outline"
+                                      size="sm"
+                                      className="flex items-center gap-2 text-sm justify-between"
+                                      onClick={() => handleDownload(material, 'material')}
                                     >
-                                      <Download className="h-3 w-3" />
-                                      <span className="flex-1 truncate">{material.name}</span>
+                                      <div className="flex items-center gap-2 truncate">
+                                        {getFileIcon(material.type)}
+                                        <span className="truncate">{material.name}</span>
+                                      </div>
                                       <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{material.type}</span>
-                                    </a>
+                                    </Button>
                                   ))}
                                 </div>
                               </div>
@@ -434,8 +522,9 @@ const CourseDetails = () => {
                   size="lg" 
                   className="w-full max-w-md text-lg"
                   onClick={() => handlePaymentComplete(course.id)}
+                  disabled={hasCompletedEnrollment}
                 >
-                  Enroll for Free
+                  {hasCompletedEnrollment ? "Already Enrolled" : "Enroll for Free"}
                 </Button>
               </CardContent>
             </Card>
@@ -457,5 +546,8 @@ const CourseDetails = () => {
     </div>
   );
 };
+
+// Import courses data for demo videos and materials
+import { courses as coursesData } from "@/data/coursesData";
 
 export default CourseDetails;
