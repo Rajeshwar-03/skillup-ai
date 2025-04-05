@@ -3,63 +3,31 @@ import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface ReviewType {
-  id: string;
-  name: string;
-  avatar?: string;
-  rating: number;
-  comment: string;
-  date: string;
-}
+import { supabase } from "@/integrations/supabase/client";
+import { CourseReview } from "@/types/database";
 
 interface CourseReviewsProps {
   courseId: string;
 }
 
 export const CourseReviews = ({ courseId }: CourseReviewsProps) => {
-  const [reviews, setReviews] = useState<ReviewType[]>([]);
+  const [reviews, setReviews] = useState<CourseReview[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, we would fetch reviews from the backend
-    // For now, we'll use mock data
     const fetchReviews = async () => {
       setLoading(true);
       try {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const { data, error } = await supabase
+          .from('course_reviews')
+          .select('*')
+          .eq('course_id', courseId)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
         
-        // Mock reviews data
-        const mockReviews: ReviewType[] = [
-          {
-            id: "1",
-            name: "Sarah Johnson",
-            avatar: "/placeholder.svg",
-            rating: 5,
-            comment: "This course exceeded my expectations! The instructor explained complex concepts in a way that made them easy to understand.",
-            date: "2023-03-15",
-          },
-          {
-            id: "2",
-            name: "Michael Chen",
-            avatar: "/placeholder.svg",
-            rating: 4,
-            comment: "Great content and well-structured. Would have given 5 stars if there were more practical exercises.",
-            date: "2023-02-28",
-          },
-          {
-            id: "3",
-            name: "Emma Williams",
-            avatar: "/placeholder.svg",
-            rating: 5,
-            comment: "The instructor's expertise really shines through. I feel much more confident in my skills after completing this course.",
-            date: "2023-01-22",
-          },
-        ];
-        
-        setReviews(mockReviews);
-      } catch (error) {
+        setReviews(data || []);
+      } catch (error: any) {
         console.error("Error fetching reviews:", error);
       } finally {
         setLoading(false);
@@ -105,14 +73,14 @@ export const CourseReviews = ({ courseId }: CourseReviewsProps) => {
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               <Avatar>
-                <AvatarImage src={review.avatar} alt={review.name} />
-                <AvatarFallback>{review.name.substring(0, 2)}</AvatarFallback>
+                <AvatarImage src="/placeholder.svg" alt={review.reviewer_name} />
+                <AvatarFallback>{review.reviewer_name.substring(0, 2)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
-                  <h4 className="font-medium">{review.name}</h4>
+                  <h4 className="font-medium">{review.reviewer_name}</h4>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(review.date).toLocaleDateString()}
+                    {new Date(review.created_at).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="flex mb-2">{renderStars(review.rating)}</div>

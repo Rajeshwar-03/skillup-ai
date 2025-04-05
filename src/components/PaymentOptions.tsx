@@ -26,6 +26,7 @@ export const PaymentOptions = ({
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const [accessComplete, setAccessComplete] = useState(false);
 
   useEffect(() => {
     // Check if user is already enrolled
@@ -35,14 +36,15 @@ export const PaymentOptions = ({
       setIsEnrolled(enrolled);
       setIsChecking(false);
       
-      // If already enrolled and showAccessButton is true, redirect to course access
-      if (enrolled && showAccessButton) {
+      // If already enrolled and showAccessButton is true, redirect to course access only once
+      if (enrolled && showAccessButton && !accessComplete) {
+        setAccessComplete(true);
         onPaymentComplete(courseId);
       }
     };
     
     checkEnrollment();
-  }, [courseId, onPaymentComplete, showAccessButton]);
+  }, [courseId, onPaymentComplete, showAccessButton, accessComplete]);
 
   const handlePaymentSimulation = async (paymentMethod: string) => {
     setIsLoading(true);
@@ -56,12 +58,14 @@ export const PaymentOptions = ({
           toast.info("You are already enrolled in this course");
           setOpen(false);
           setIsEnrolled(true);
+          setAccessComplete(true);
           onPaymentComplete(courseId);
         } else {
           setTimeout(() => {
             setOpen(false);
             toast.success("Payment successful! You now have access to the course.");
             setIsEnrolled(true);
+            setAccessComplete(true);
             onPaymentComplete(courseId);
           }, 1500);
         }
@@ -77,9 +81,12 @@ export const PaymentOptions = ({
   };
 
   const handleFreeEnrollment = () => {
+    if (isEnrolled) return;
+    
     toast.success("Enrolling you in this free course...");
     setTimeout(() => {
       setIsEnrolled(true);
+      setAccessComplete(true);
       onPaymentComplete(courseId);
     }, 1000);
   };

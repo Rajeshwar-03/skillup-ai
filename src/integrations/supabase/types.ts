@@ -60,6 +60,36 @@ export type Database = {
         }
         Relationships: []
       }
+      course_reviews: {
+        Row: {
+          comment: string
+          course_id: string
+          created_at: string
+          id: string
+          rating: number
+          reviewer_name: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          course_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_name: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

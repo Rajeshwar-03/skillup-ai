@@ -52,9 +52,9 @@ export const PaymentButton = ({
   }
 
   return (
-    <Button className="w-full" size="lg" onClick={onClick}>
+    <Button className="w-full" size="lg" onClick={onClick} disabled={isEnrolled}>
       <CreditCard className="mr-2 h-4 w-4" />
-      {isEnrolled ? "Purchase Full Access" : `Purchase Course ($${price})`}
+      {isEnrolled ? "Already Enrolled" : `Purchase Course ($${price})`}
     </Button>
   );
 };
