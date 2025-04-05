@@ -16,7 +16,6 @@ export const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const apiKey = "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";
 
   // Only scroll to bottom when new messages are added, not on initial load
   useEffect(() => {
@@ -40,15 +39,14 @@ export const AIChat = () => {
 
     try {
       // Save user message
-      const saveSuccess = await saveChatMessage(userMessage.content, false);
-      if (!saveSuccess) {
-        toast.error("Please sign in to send messages");
-        setIsLoading(false);
-        return;
-      }
+      await saveChatMessage(userMessage.content, false)
+        .catch(error => {
+          console.error("Error saving user message:", error);
+          // Continue even if saving fails
+        });
 
       // Get AI response
-      const response = await sendChatRequest([...messages, userMessage], apiKey);
+      const response = await sendChatRequest([...messages, userMessage]);
       
       if (response.success) {
         const aiResponse = { 
@@ -57,9 +55,15 @@ export const AIChat = () => {
         };
         
         // Save AI response
-        await saveChatMessage(aiResponse.content, true);
+        await saveChatMessage(aiResponse.content, true)
+          .catch(error => {
+            console.error("Error saving AI message:", error);
+            // Continue even if saving fails
+          });
         
         setMessages(prev => [...prev, aiResponse]);
+      } else {
+        toast.error("Failed to get a response. Please try again.");
       }
     } catch (error) {
       console.error("Error sending message:", error);

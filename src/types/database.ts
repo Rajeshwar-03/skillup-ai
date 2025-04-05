@@ -20,3 +20,24 @@ export interface CourseReview {
   comment: string;
   created_at: string;
 }
+
+export interface LiveSession {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string;
+  instructor: string;
+  date: string;
+  time: string;
+  duration: number;
+  zoom_link: string;
+}
+
+export interface ProfessorReview {
+  id: string;
+  professor_name: string;
+  institution: string;
+  profile_image: string;
+  comment: string;
+  rating: number;
+}

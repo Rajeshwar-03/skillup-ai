@@ -3,8 +3,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { motion } from "framer-motion";
 import { Users, MessageSquare, Lightbulb, Calendar, Video, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfessorReview } from "@/types/database";
+import { useState } from "react";
 
 export const Community = () => {
+  const [professorReviews] = useState<ProfessorReview[]>([
+    {
+      id: "1",
+      professor_name: "Dr. Emily Chen",
+      institution: "Stanford University",
+      profile_image: "/placeholder.svg",
+      comment: "The course platform has been instrumental in helping my students grasp complex concepts. The interactive elements and AI assistance have significantly improved engagement and retention rates in my classes.",
+      rating: 5
+    },
+    {
+      id: "2",
+      professor_name: "Prof. James Wilson",
+      institution: "MIT",
+      profile_image: "/placeholder.svg",
+      comment: "As an educator with over 20 years of experience, I'm impressed by the quality of content and the thoughtful pedagogical approach. The platform bridges theoretical knowledge with practical applications effectively.",
+      rating: 4
+    },
+    {
+      id: "3",
+      professor_name: "Dr. Maria Rodriguez",
+      institution: "UC Berkeley",
+      profile_image: "/placeholder.svg",
+      comment: "The doubt clarification system is phenomenal. My students report faster learning progress and greater confidence in tackling difficult subjects when using this platform alongside traditional classroom instruction.",
+      rating: 5
+    }
+  ]);
+
   const communityFeatures = [
     {
       icon: <Users className="h-8 w-8 text-primary" />,
@@ -62,6 +92,26 @@ export const Community = () => {
     }
   ];
 
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <svg
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+        }`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    ));
+  };
+
   return (
     <section className="py-24 relative overflow-hidden bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-950" id="community">
       <div className="container mx-auto px-4">
@@ -85,6 +135,82 @@ export const Community = () => {
             Learning is better together. Connect with fellow students, instructors, and industry professionals.
           </motion.p>
         </div>
+
+        {/* Professor Reviews Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-16"
+        >
+          <h3 className="text-2xl font-bold mb-6 text-center">What Professors Say About Us</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {professorReviews.map((review) => (
+              <Card key={review.id} className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={review.profile_image} alt={review.professor_name} />
+                    <AvatarFallback>{review.professor_name.substring(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-lg">{review.professor_name}</CardTitle>
+                    <CardDescription>{review.institution}</CardDescription>
+                    <div className="flex mt-1">{renderStars(review.rating)}</div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{review.comment}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Doubt Clarification Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-16"
+        >
+          <h3 className="text-2xl font-bold mb-6 text-center">Doubt Clarification System</h3>
+          <Card className="max-w-4xl mx-auto">
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row gap-6 items-center">
+                <div className="flex-1">
+                  <h4 className="text-xl font-semibold mb-2">Get Your Questions Answered</h4>
+                  <p className="text-muted-foreground mb-4">
+                    Our dedicated doubt clarification system connects you directly with course instructors and expert teaching assistants to resolve your questions quickly.
+                  </p>
+                  <ul className="space-y-2 mb-4">
+                    <li className="flex items-start gap-2">
+                      <Lightbulb className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <span>24/7 access to AI-powered preliminary answers</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <MessageSquare className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <span>Live chat with teaching assistants during scheduled hours</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Video className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <span>Weekly office hours with course professors</span>
+                    </li>
+                  </ul>
+                  <Button className="w-full md:w-auto">Ask a Question</Button>
+                </div>
+                <div className="md:w-1/3">
+                  <img 
+                    src="/placeholder.svg" 
+                    alt="Student getting help" 
+                    className="rounded-lg shadow-md w-full"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {communityFeatures.map((feature, index) => (

@@ -12,7 +12,8 @@ export const saveChatMessage = async (message: string, isAssistant: boolean) => 
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      throw new Error("User not authenticated");
+      console.log("User not authenticated, continuing without saving message");
+      return true; // Don't fail the chat if user is not authenticated
     }
 
     const { error } = await supabase
@@ -29,16 +30,15 @@ export const saveChatMessage = async (message: string, isAssistant: boolean) => 
     return true;
   } catch (error) {
     console.error("Error saving chat message:", error);
-    return false;
+    return true; // Don't fail the chat if saving fails
   }
 };
 
-export const sendChatRequest = async (messages: ChatMessage[], apiKey?: string) => {
+export const sendChatRequest = async (messages: ChatMessage[]) => {
   try {
     const { data, error } = await supabase.functions.invoke("chat", {
       body: { 
-        messages: messages.map(m => ({ role: m.role, content: m.content })),
-        apiKey
+        messages: messages.map(m => ({ role: m.role, content: m.content }))
       }
     });
 

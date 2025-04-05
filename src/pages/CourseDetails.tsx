@@ -1,285 +1,248 @@
 
-import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { ClockIcon, BookOpen, Users, Star, ArrowLeft } from "lucide-react";
-import { ChevronRight } from "lucide-react";
-import { Navigation } from "@/components/Navigation";
-import { PaymentOptions } from "@/components/PaymentOptions";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useEnrollment } from "@/hooks/useEnrollment";
+import { courses } from "@/data/coursesData";
+import { courseDetails } from "@/data/courseDetailsData";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, Download, Play } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PaymentModal } from "@/components/payment/PaymentModal";
 import { CourseReviews } from "@/components/reviews/CourseReviews";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { CourseMaterials } from "@/components/courses/CourseMaterials";
-import { toast } from "sonner";
-import { courses } from "@/data/coursesData";
+import { LiveSessions } from "@/components/courses/LiveSessions";
 
 const CourseDetails = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { courseId } = useParams<{ courseId: string }>();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [refreshReviews, setRefreshReviews] = useState(0);
+  const navigate = useNavigate();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
 
-  // Find the course by ID
-  const course = courses.find(c => c.path === courseId);
+  // Find course information
+  const course = courses.find((c) => c.path === courseId);
+  const detail = courseDetails.find((c) => c.courseId === courseId);
 
-  // Use the enrollment hook
-  const { handleEnroll, completeEnrollment } = useEnrollment(courses);
+  const { enrollmentStatus, isLoading, handleEnroll, completeEnrollment } = useEnrollment(courses);
 
   useEffect(() => {
-    // Check if URL has query param for enrollment
-    const searchParams = new URLSearchParams(location.search);
-    const shouldEnroll = searchParams.get('enroll') === 'true';
-    
-    if (shouldEnroll && course) {
-      handleEnroll(course);
-      
-      // Clean up the URL
-      navigate(`/course/${courseId}`, { replace: true });
+    // Check if the user has access when the component mounts
+    if (courseId && enrollmentStatus[courseId]?.enrolled) {
+      setAccessGranted(true);
     }
-  }, [location, courseId, navigate, course, handleEnroll]);
+  }, [courseId, enrollmentStatus]);
 
-  if (!course) {
+  const handleEnrollClick = () => {
+    if (!course) return;
+    
+    if (course.price === 0) {
+      handleEnroll(course.path);
+    } else {
+      setShowPaymentModal(true);
+    }
+  };
+
+  const handlePaymentComplete = (success: boolean) => {
+    setShowPaymentModal(false);
+    if (success && course) {
+      completeEnrollment(course.path);
+      setAccessGranted(true);
+    }
+  };
+
+  const handleBackClick = () => {
+    navigate("/");
+  };
+
+  if (!course || !detail) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Course Not Found</h2>
-          <Button onClick={() => navigate('/')}>Return to Home</Button>
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <Button 
+            variant="ghost" 
+            onClick={handleBackClick} 
+            className="mb-6 hover:bg-transparent"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Back to Courses
+          </Button>
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-1/2" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-[300px] w-full rounded-xl" />
+          </div>
         </div>
       </div>
     );
   }
 
-  const handleWatchDemo = () => {
-    window.open(course.demoVideo, '_blank');
-    toast.success("Loading demo video...");
-  };
-
-  const handleReviewSubmitted = () => {
-    setShowReviewForm(false);
-    setRefreshReviews(prev => prev + 1);
-    toast.success("Thank you for your review!");
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3]">
-      <Navigation />
-      
-      <Button 
-        onClick={() => navigate(-1)} 
-        variant="ghost" 
-        className="fixed top-24 left-4 z-50"
-      >
-        <ArrowLeft className="mr-2" />
-        Back
-      </Button>
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto">
+        <Button 
+          variant="ghost" 
+          onClick={handleBackClick} 
+          className="mb-6 hover:bg-transparent"
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Back to Courses
+        </Button>
 
-      <main className="container mx-auto px-4 pt-24 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Course Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-3"
-          >
-            <div className="flex flex-col md:flex-row gap-6 items-start">
-              <div className="w-full md:w-1/3 aspect-video rounded-xl overflow-hidden">
-                <img 
-                  src={course.image} 
-                  alt={course.title} 
-                  className="w-full h-full object-cover"
-                />
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
+          <p className="text-muted-foreground">{course.description}</p>
+          
+          <div className="mt-6 flex flex-wrap gap-4">
+            <div className="bg-muted rounded-lg px-4 py-2">
+              <span className="text-sm font-medium">Level:</span> {course.level}
+            </div>
+            <div className="bg-muted rounded-lg px-4 py-2">
+              <span className="text-sm font-medium">Duration:</span> {course.duration}
+            </div>
+            <div className="bg-muted rounded-lg px-4 py-2">
+              <span className="text-sm font-medium">Students:</span> {course.students.toLocaleString()}
+            </div>
+            <div className="bg-muted rounded-lg px-4 py-2">
+              <span className="text-sm font-medium">Rating:</span> {course.rating}/5
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8 overflow-hidden rounded-xl border">
+          <div className="relative pt-[56.25%]">
+            <iframe
+              className="absolute inset-0 h-full w-full"
+              src={detail.demoVideoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ"}
+              title={`${course.title} Demo Video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+          <div className="bg-card p-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-medium">Course Demo</h3>
+                <p className="text-sm text-muted-foreground">
+                  Watch this preview to learn more about the course content
+                </p>
               </div>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    course.level === 'Beginner' ? 'bg-green-100 text-green-800' :
-                    course.level === 'Intermediate' ? 'bg-blue-100 text-blue-800' :
-                    'bg-purple-100 text-purple-800'
-                  }`}>
-                    {course.level}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm font-medium">{course.rating}</span>
-                  </div>
-                </div>
-                
-                <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
-                <p className="text-muted-foreground mb-4">{course.description}</p>
-                
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <ClockIcon className="w-5 h-5 text-primary" />
-                    <span>40 hours</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    <span>12 modules</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-primary" />
-                    <span>{course.students.toLocaleString()} students</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <PaymentOptions 
-                    courseTitle={course.title}
-                    price={course.price}
-                    courseId={course.path}
-                    onPaymentComplete={completeEnrollment}
-                    showAccessButton={true}
-                  />
-                  <Button variant="outline" onClick={handleWatchDemo}>
-                    Watch Demo
-                  </Button>
-                </div>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open(detail.demoVideoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank")}
+                  className="flex items-center gap-2"
+                >
+                  <Play className="h-4 w-4" />
+                  Open in YouTube
+                </Button>
               </div>
             </div>
-          </motion.div>
-
-          {/* Course Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-2"
-          >
-            <Card className="glass">
-              <CardContent className="p-6">
-                <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="mb-6">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="materials">Materials</TabsTrigger>
-                    <TabsTrigger value="reviews">Reviews</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="overview" className="space-y-6">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4">About this course</h3>
-                      <p className="text-muted-foreground">
-                        This comprehensive {course.title} course is designed to take you from beginner to professional. 
-                        You'll learn all the essential concepts, tools, and best practices needed to excel in this field.
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4">What you'll learn</h3>
-                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {[
-                          "Fundamentals and core concepts",
-                          "Industry best practices",
-                          "Real-world project implementation",
-                          "Advanced techniques and optimization",
-                          "Problem-solving strategies",
-                          "Team collaboration workflow"
-                        ].map((item, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <ChevronRight className="w-4 h-4 text-primary" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4">Requirements</h3>
-                      <ul className="space-y-2">
-                        {[
-                          "Basic understanding of computers and technology",
-                          "Desire to learn and practice regularly",
-                          "Computer with internet connection"
-                        ].map((item, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <ChevronRight className="w-4 h-4 text-primary" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="materials">
-                    <CourseMaterials 
-                      materials={course.materials || []}
-                      demoVideo={course.demoVideo}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="reviews">
-                    <div className="space-y-8">
-                      {!showReviewForm && (
-                        <div className="flex justify-end">
-                          <Button onClick={() => setShowReviewForm(true)}>
-                            Write a Review
-                          </Button>
-                        </div>
-                      )}
-                      
-                      {showReviewForm && (
-                        <ReviewForm 
-                          courseId={course.path} 
-                          onReviewSubmitted={handleReviewSubmitted} 
-                        />
-                      )}
-                      
-                      <CourseReviews key={refreshReviews} courseId={course.path} />
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Sidebar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-6"
-          >
-            <Card className="glass overflow-hidden">
-              <CardContent className="p-0">
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Course Modules</h3>
-                  <div className="space-y-4">
-                    {[
-                      "Introduction to the Course",
-                      "Core Concepts and Foundations",
-                      "Building Your First Project",
-                      "Advanced Techniques",
-                      "Working with Teams",
-                      "Deployment and Publishing",
-                    ].map((module, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                          {i + 1}
-                        </div>
-                        <span>{module}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="border-t p-6">
-                  <PaymentOptions 
-                    courseTitle={course.title}
-                    price={course.price}
-                    courseId={course.path}
-                    onPaymentComplete={completeEnrollment}
-                    showAccessButton={true}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+          </div>
         </div>
-      </main>
+
+        {enrollmentStatus[course.path]?.enrolled || accessGranted ? (
+          <div className="space-y-8">
+            <div className="p-6 bg-primary/10 rounded-xl">
+              <h2 className="text-2xl font-bold mb-2">You have full access to this course!</h2>
+              <p className="mb-4">Start learning now and unlock your potential.</p>
+              <Button size="lg">
+                Start Learning
+              </Button>
+            </div>
+            
+            {/* Course Materials Section */}
+            <CourseMaterials courseId={course.path} />
+            
+            {/* Live Sessions Section */}
+            <LiveSessions courseId={course.path} />
+
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div className="p-6 bg-card rounded-xl border">
+              <h2 className="text-2xl font-bold mb-2">{course.price === 0 ? 'Enroll for Free' : `Enroll for $${course.price}`}</h2>
+              <p className="mb-6 text-muted-foreground">
+                Gain access to all course materials, assignments, and receive a certificate upon completion.
+              </p>
+              
+              <div className="mb-6">
+                <h3 className="font-bold mb-2">What you'll learn:</h3>
+                <ul className="space-y-2">
+                  {detail.learningOutcomes.map((outcome, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      </div>
+                      <span>{outcome}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <Button 
+                size="lg" 
+                className="w-full" 
+                onClick={handleEnrollClick}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : course.price === 0 ? 'Enroll Now (Free)' : `Enroll Now ($${course.price})`}
+              </Button>
+            </div>
+            
+            {/* Course Preview Materials */}
+            <div className="border rounded-xl p-6">
+              <h2 className="text-2xl font-bold mb-4">Sample Course Materials</h2>
+              <p className="text-muted-foreground mb-6">
+                Preview some of the course materials before enrolling
+              </p>
+              
+              <div className="space-y-4">
+                {detail.previewMaterials?.map((material, index) => (
+                  <div key={index} className="border rounded-lg p-4 flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium">{material.title}</h3>
+                      <p className="text-sm text-muted-foreground">{material.description}</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      Download
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Course Reviews Section */}
+        <div className="mt-12 border-t pt-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Student Reviews</h2>
+            <div className="flex items-center gap-2">
+              <div className="text-3xl font-bold">{course.rating}</div>
+              <div className="text-muted-foreground">/ 5</div>
+            </div>
+          </div>
+          
+          <CourseReviews courseId={course.path} />
+          
+          <div className="mt-8 pt-8 border-t">
+            <h3 className="text-xl font-bold mb-4">Share Your Experience</h3>
+            <ReviewForm courseId={course.path} courseName={course.title} />
+          </div>
+        </div>
+      </div>
+      
+      <PaymentModal 
+        isOpen={showPaymentModal} 
+        onClose={() => setShowPaymentModal(false)}
+        onPaymentComplete={handlePaymentComplete}
+        courseTitle={course.title}
+        courseId={course.path}
+        price={course.price}
+      />
     </div>
   );
 };
