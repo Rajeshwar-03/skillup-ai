@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -53,19 +52,39 @@ interface LiveSession {
   meetingUrl: string;
 }
 
-const createMockLiveSessions = (count: number): LiveSession[] => {
-  const sessions: LiveSession[] = Array.from({ length: count }, (_, i) => ({
-    id: `session-${i + 1}`,
-    title: `Live Session ${i + 1}`,
-    description: `Description for live session ${i + 1}`,
-    dateTime: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000).toISOString(),
-    duration: 60, // minutes
-    instructor: `Instructor ${i + 1}`,
-    thumbnailUrl: `/placeholder.svg`,
-    meetingUrl: `https://meet.example.com/session-${i + 1}`
-  }));
+const createMockLiveSessions = (count: number, courseId: string): LiveSession[] => {
+  const topics = {
+    "full-stack": ["React Hooks Deep Dive", "Building Responsive Layouts", "State Management with Redux"],
+    "ai-ml": ["Neural Networks Explained", "Computer Vision Applications", "Natural Language Processing"],
+    "aws": ["EC2 Instance Management", "S3 Storage Solutions", "Lambda Functions"],
+    "devops": ["CI/CD Pipeline Setup", "Docker Containerization", "Kubernetes Orchestration"],
+    "blockchain": ["Smart Contract Development", "Web3 Integration", "DeFi Applications"],
+    "ui-ux": ["Design System Creation", "User Research Methods", "Prototyping Techniques"],
+    "data-science": ["Data Visualization", "Predictive Modeling", "Feature Engineering"],
+    "cybersecurity": ["Network Security", "Ethical Hacking", "Security Auditing"],
+    "mobile-dev": ["React Native Navigation", "Mobile UI Best Practices", "App Store Deployment"],
+    "python": ["Python Data Structures", "Web Scraping with Python", "Testing in Python"],
+    "digital-marketing": ["SEO Strategy", "Content Marketing", "Social Media Analytics"],
+    "iot": ["Sensor Integration", "IoT Protocols", "Edge Computing"],
+    "game-dev": ["Unity Physics", "3D Asset Creation", "Game AI Systems"],
+    "cloud-native": ["Microservices Architecture", "Service Mesh Implementation", "Cloud-Native Security"],
+    "data-engineering": ["Data Pipeline Design", "ETL Processes", "Big Data Technologies"]
+  };
+
+  const defaultTopics = ["Workshop Session", "Q&A Session", "Expert Interview"];
   
-  return sessions;
+  const courseTitleList = topics[courseId as keyof typeof topics] || defaultTopics;
+  
+  return Array.from({ length: count }, (_, i) => ({
+    id: `session-${courseId}-${i + 1}`,
+    title: courseTitleList[i % courseTitleList.length] || `Live Session ${i + 1}`,
+    description: `Interactive session for ${courseId} course students with live Q&A and hands-on exercises.`,
+    dateTime: new Date(Date.now() + (i + 1) * 3 * 24 * 60 * 60 * 1000).toISOString(),
+    duration: 60, // minutes
+    instructor: courseDetailsData[courseId]?.instructor || "Expert Instructor",
+    thumbnailUrl: `/placeholder.svg`,
+    meetingUrl: `https://meet.example.com/session-${courseId}-${i + 1}`
+  }));
 };
 
 const CourseDetails = () => {
@@ -78,21 +97,34 @@ const CourseDetails = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch course details and live sessions based on courseId
     const fetchCourseDetails = async () => {
       setLoading(true);
       try {
-        // Get the specific course details based on courseId
         if (courseId && courseDetailsData[courseId]) {
           setCourse(courseDetailsData[courseId]);
+          
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: enrollment } = await supabase
+              .from('course_enrollments')
+              .select('status')
+              .eq('user_id', user.id)
+              .eq('course_id', courseId)
+              .maybeSingle();
+              
+            if (enrollment) {
+              setAccessGranted(true);
+            }
+          }
         } else {
           toast.error("Course not found");
           navigate("/");
         }
 
-        // Simulate fetching live sessions
-        const mockSessions = createMockLiveSessions(2);
-        setLiveSessions(mockSessions);
+        if (courseId) {
+          const mockSessions = createMockLiveSessions(3, courseId);
+          setLiveSessions(mockSessions);
+        }
       } catch (error) {
         console.error("Failed to fetch course details:", error);
         toast.error("Failed to load course details. Please try again.");
@@ -105,16 +137,26 @@ const CourseDetails = () => {
   }, [courseId, navigate]);
 
   const handlePaymentComplete = (courseId: string) => {
-    // After successful payment, navigate to the course access page
     setAccessGranted(true);
     toast.success("You now have full access to the course!");
-    navigate(`/course/${courseId}`); // Navigate to the same course details page
+    navigate(`/course/${courseId}`);
   };
 
-  const handleSubmitReview = (review: {name: string, rating: number, comment: string}) => {
-    // Handle the submission of a new review
-    console.log("New review submitted:", review);
-    toast.success("Review submitted successfully!");
+  const handleSubmitReview = async (review: {name: string, rating: number, comment: string}) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in to submit a review");
+        return;
+      }
+      
+      console.log("New review submitted:", review);
+      toast.success("Review submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("Failed to submit review. Please try again.");
+    }
   };
 
   const handlePlayVideo = (videoUrl: string) => {
@@ -275,9 +317,8 @@ const CourseDetails = () => {
                                   size="sm" 
                                   className="flex items-center gap-1 ml-2"
                                   onClick={() => {
-                                    // In a real app, you'd implement proper download functionality
                                     window.open(lesson.videoUrl, '_blank');
-                                    toast.success("Download started");
+                                    toast.success(`Downloading ${lesson.title} video`);
                                   }}
                                 >
                                   <Download className="h-3 w-3" /> Download Video

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CourseReviewFormProps {
   courseId: string;
@@ -15,6 +16,28 @@ export const CourseReviewForm = ({ courseId, onSubmitReview }: CourseReviewFormP
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userName, setUserName] = useState("Anonymous User");
+
+  // Get user information when component mounts
+  useState(() => {
+    const fetchUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', user.id)
+          .single();
+          
+        if (profile) {
+          const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+          setUserName(fullName || user.email?.split('@')[0] || "Anonymous User");
+        }
+      }
+    };
+    
+    fetchUserProfile();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +55,14 @@ export const CourseReviewForm = ({ courseId, onSubmitReview }: CourseReviewFormP
     setIsSubmitting(true);
     
     try {
-      // Get user name from Supabase
-      // For now, we'll use "Current User" as a placeholder
-      const userName = "Current User";
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // If no user is logged in, prompt them to sign in
+      if (!user) {
+        toast.error("Please sign in to submit a review");
+        setIsSubmitting(false);
+        return;
+      }
       
       const newReview = {
         name: userName,
