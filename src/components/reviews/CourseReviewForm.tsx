@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
@@ -19,7 +19,7 @@ export const CourseReviewForm = ({ courseId, onSubmitReview }: CourseReviewFormP
   const [userName, setUserName] = useState("Anonymous User");
 
   // Get user information when component mounts
-  useState(() => {
+  useEffect(() => {
     const fetchUserProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
