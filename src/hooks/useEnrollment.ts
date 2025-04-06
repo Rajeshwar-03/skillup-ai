@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkCourseEnrollment } from "@/services/chatService";
 
 // Define a common course type to make this reusable
-type CourseType = {
+export interface CourseType {
   path: string;
   price?: number;
   demoVideo?: string;
-};
+}
 
 export const useEnrollment = (courses: CourseType[]) => {
   const navigate = useNavigate();
@@ -30,14 +30,19 @@ export const useEnrollment = (courses: CourseType[]) => {
         const statuses: Record<string, boolean> = {};
         
         for (const course of courses) {
-          const { enrolled } = await checkCourseEnrollment(course.path);
-          statuses[course.path] = enrolled;
+          try {
+            const { enrolled } = await checkCourseEnrollment(course.path);
+            statuses[course.path] = enrolled;
+          } catch (error) {
+            console.error(`Error checking enrollment for course ${course.path}:`, error);
+            statuses[course.path] = false;
+          }
         }
         
         setEnrollmentStatus(statuses);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error checking enrollments:", error);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -66,8 +71,12 @@ export const useEnrollment = (courses: CourseType[]) => {
 
       if (error) throw error;
       
-      window.open(course.demoVideo, '_blank');
-      toast.success("Loading demo video...");
+      if (course.demoVideo) {
+        window.open(course.demoVideo, '_blank');
+        toast.success("Loading demo video...");
+      } else {
+        toast.error("Demo video not available");
+      }
     } catch (error) {
       console.error("Error logging demo view:", error);
       toast.error("Failed to load demo video. Please try again.");

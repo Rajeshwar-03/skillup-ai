@@ -32,14 +32,20 @@ export const PaymentOptions = ({
     // Check if user is already enrolled
     const checkEnrollment = async () => {
       setIsChecking(true);
-      const { enrolled } = await checkCourseEnrollment(courseId);
-      setIsEnrolled(enrolled);
-      setIsChecking(false);
-      
-      // If already enrolled and showAccessButton is true, redirect to course access only once
-      if (enrolled && showAccessButton && !accessComplete) {
-        setAccessComplete(true);
-        onPaymentComplete(courseId);
+      try {
+        const { enrolled } = await checkCourseEnrollment(courseId);
+        setIsEnrolled(enrolled);
+        
+        // If already enrolled and showAccessButton is true, redirect to course access only once
+        if (enrolled && showAccessButton && !accessComplete) {
+          setAccessComplete(true);
+          onPaymentComplete(courseId);
+        }
+      } catch (error) {
+        console.error("Error checking enrollment:", error);
+        toast.error("Failed to check enrollment status");
+      } finally {
+        setIsChecking(false);
       }
     };
     
@@ -70,7 +76,7 @@ export const PaymentOptions = ({
           }, 1500);
         }
       } else {
-        toast.error(result.message);
+        toast.error(result.message || "Payment failed");
       }
     } catch (error) {
       console.error("Payment error:", error);
@@ -83,10 +89,13 @@ export const PaymentOptions = ({
   const handleFreeEnrollment = () => {
     if (isEnrolled) return;
     
+    setIsLoading(true);
     toast.success("Enrolling you in this free course...");
+    
     setTimeout(() => {
       setIsEnrolled(true);
       setAccessComplete(true);
+      setIsLoading(false);
       onPaymentComplete(courseId);
     }, 1000);
   };
@@ -128,6 +137,7 @@ export const PaymentOptions = ({
           onOpenChange={setOpen}
           courseTitle={courseTitle}
           price={price}
+          courseId={courseId}
           onPaymentComplete={handlePaymentSimulation}
           isLoading={isLoading}
         />

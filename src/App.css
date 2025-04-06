@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -35,8 +36,36 @@
 
 .card {
   padding: 2em;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 .read-the-docs {
   color: #888;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-purple {
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+}
+
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
+}
+
+.bg-gradient-green {
+  background: linear-gradient(135deg, #6ee7b7 0%, #059669 100%);
+}
+
+.bg-gradient-pink {
+  background: linear-gradient(135deg, #f9a8d4 0%, #db2777 100%);
 }

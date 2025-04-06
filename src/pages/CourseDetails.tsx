@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { courseDetailsData } from "@/data/courseDetailsData";
@@ -82,7 +81,7 @@ const CourseDetails = () => {
   const materials = additionalCourseData?.materials || [];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -153,7 +152,7 @@ const CourseDetails = () => {
                   <h2 className="text-xl font-semibold mb-4">Course content</h2>
                   <div className="space-y-4">
                     {courseData.modules.map((module, index) => (
-                      <Card key={index}>
+                      <Card key={index} className="backdrop-blur-sm bg-white/70 hover:bg-white/90 transition-all">
                         <CardHeader className="py-3">
                           <CardTitle className="text-lg">{module.title}</CardTitle>
                           <CardDescription>{module.lessons.length} lessons</CardDescription>
@@ -217,7 +216,7 @@ const CourseDetails = () => {
           
           {/* Enrollment Card Section */}
           <div>
-            <Card className="sticky top-20">
+            <Card className="sticky top-20 backdrop-blur-sm bg-white/80 border border-purple-100 shadow-lg">
               <CardHeader>
                 <CardTitle>
                   {courseData.price === 0 ? (
@@ -242,7 +241,7 @@ const CourseDetails = () => {
                 ) : (
                   <Button 
                     onClick={() => setIsPaymentModalOpen(true)} 
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                   >
                     {courseData.price === 0 ? "Enroll Now" : "Buy Now"}
                   </Button>
@@ -292,8 +291,9 @@ const CourseDetails = () => {
         onOpenChange={setIsPaymentModalOpen} 
         onPaymentComplete={handlePaymentComplete} 
         courseTitle={courseData.title} 
-        courseId={courseId || ""} 
+        courseId={courseId} 
         price={courseData.price} 
+        isLoading={false}
       />
     </div>
   );

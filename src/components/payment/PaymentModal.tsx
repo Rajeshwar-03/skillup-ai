@@ -9,6 +9,7 @@ interface PaymentModalProps {
   onOpenChange: (open: boolean) => void;
   courseTitle: string;
   price: number;
+  courseId?: string; // Added courseId as optional prop
   onPaymentComplete: (method: string) => void;
   isLoading: boolean;
 }
@@ -17,7 +18,8 @@ export const PaymentModal = ({
   open, 
   onOpenChange, 
   courseTitle, 
-  price, 
+  price,
+  courseId,
   onPaymentComplete,
   isLoading
 }: PaymentModalProps) => {

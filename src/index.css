@@ -56,6 +56,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e2e8fd 100%);
   }
 }
 
@@ -104,4 +105,17 @@
   50%, 100% {
     background-color: rgba(var(--primary), 0.2);
   }
+}
+
+/* Card and container styles */
+.glass-card {
+  @apply backdrop-blur-sm bg-white/50 border border-white/20 shadow-lg;
+}
+
+.gradient-container {
+  background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600;
 }
