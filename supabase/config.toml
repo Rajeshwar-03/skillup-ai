@@ -3,3 +3,6 @@ project_id = "uecljvnuuwkvdxcmveho"
 
 [functions."grok-chat"]
 verify_jwt = false
+
+[functions."x-ai-chat"]
+verify_jwt = false

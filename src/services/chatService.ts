@@ -36,7 +36,29 @@ export const saveChatMessage = async (message: string, isAssistant: boolean) => 
 
 export const sendChatRequest = async (messages: ChatMessage[]) => {
   try {
-    // Try the new grok-chat function first
+    // Try the X.AI chat function first
+    try {
+      const { data, error } = await supabase.functions.invoke("x-ai-chat", {
+        body: { 
+          messages: messages.map(m => ({ role: m.role, content: m.content }))
+        }
+      });
+
+      if (error) {
+        console.warn("X.AI chat function error, falling back to grok-chat function:", error);
+        // Fall back to the grok-chat function if x-ai-chat fails
+      } else {
+        return { 
+          success: true, 
+          message: data.message || "I couldn't generate a response. Please try again."
+        };
+      }
+    } catch (xAiError) {
+      console.warn("Error with X.AI chat function, falling back:", xAiError);
+      // Continue to fallback
+    }
+
+    // Try the grok-chat function as first fallback
     try {
       const { data, error } = await supabase.functions.invoke("grok-chat", {
         body: { 

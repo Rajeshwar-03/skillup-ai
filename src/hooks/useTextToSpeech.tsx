@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 export const useTextToSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-
+  
   const speakText = async (text: string) => {
     if (isSpeaking) return;
     
@@ -17,10 +17,12 @@ export const useTextToSpeech = () => {
       
       if (error) throw error;
       
-      if (data.audioContent) {
+      if (data?.audioContent) {
         const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
         audio.onended = () => setIsSpeaking(false);
         await audio.play();
+      } else {
+        setIsSpeaking(false);
       }
     } catch (error) {
       console.error("Text to speech error:", error);

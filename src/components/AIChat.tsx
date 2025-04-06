@@ -16,7 +16,7 @@ export const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
-  const { speak, isSpeaking, stopSpeaking } = useTextToSpeech();
+  const { speakText, isSpeaking } = useTextToSpeech();
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -27,9 +27,7 @@ export const AIChat = () => {
 
   const handleSendMessage = async (message: string) => {
     // Stop any ongoing speech when sending a new message
-    if (isSpeaking) {
-      stopSpeaking();
-    }
+    // No need to call stopSpeaking since we don't have that function
     
     // Add user message to the chat
     const userMessage: ChatMessageType = { role: "user", content: message };
@@ -54,9 +52,9 @@ export const AIChat = () => {
         // Save AI message
         await saveChatMessage(response.message, true);
         
-        // Read out the response
-        if (open) {
-          speak(response.message);
+        // Read out the response if chat is open
+        if (open && speakText) {
+          speakText(response.message);
         }
       } else {
         throw new Error("Failed to get a response from the AI");
