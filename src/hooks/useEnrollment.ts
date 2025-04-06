@@ -5,7 +5,14 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { checkCourseEnrollment } from "@/services/chatService";
 
-export const useEnrollment = (courses: any[]) => {
+// Define a common course type to make this reusable
+type CourseType = {
+  path: string;
+  price?: number;
+  demoVideo?: string;
+};
+
+export const useEnrollment = (courses: CourseType[]) => {
   const navigate = useNavigate();
   const [enrollmentStatus, setEnrollmentStatus] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +45,7 @@ export const useEnrollment = (courses: any[]) => {
     checkAllEnrollments();
   }, [courses]);
 
-  const handleWatchDemo = async (course: any) => {
+  const handleWatchDemo = async (course: CourseType) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -67,7 +74,7 @@ export const useEnrollment = (courses: any[]) => {
     }
   };
 
-  const handleEnroll = async (course: any) => {
+  const handleEnroll = async (course: CourseType) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       

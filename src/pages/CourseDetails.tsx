@@ -14,26 +14,30 @@ import { CheckCircle, CalendarDays, Clock, ArrowLeft, FileText, Video, Download 
 import { CourseMaterials } from "@/components/courses/CourseMaterials";
 import { LiveSessions } from "@/components/courses/LiveSessions";
 import { CourseReviews } from "@/components/reviews/CourseReviews";
-import PaymentModal from "@/components/payment/PaymentModal";
+import { PaymentModal } from "@/components/payment/PaymentModal";
 import { useEnrollment } from "@/hooks/useEnrollment";
 import { toast } from "sonner";
+import { courses } from "@/data/coursesData";
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const { checkEnrollment, isEnrolled, isLoading: isEnrollmentLoading } = useEnrollment(courseId || "");
-
-  // Find the course using Object.values to search through all courses
+  const { enrollmentStatus, isLoading: isEnrollmentLoading, completeEnrollment } = useEnrollment([
+    courseId ? { path: courseId } : { path: "" }
+  ]);
+  
+  // Find the course data
   const courseData = Object.values(courseDetailsData).find(course => course.id === courseId);
+  // Find additional course data from coursesData
+  const additionalCourseData = courses.find(course => course.path === courseId);
+
+  const isEnrolled = courseId ? enrollmentStatus[courseId] : false;
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (courseId) {
-      checkEnrollment();
-    }
-  }, [courseId, checkEnrollment]);
+  }, [courseId]);
 
   if (!courseData) {
     return (
@@ -54,12 +58,28 @@ const CourseDetails = () => {
   const handlePaymentComplete = (method: string) => {
     setIsPaymentModalOpen(false);
     toast.success("Payment successful! You are now enrolled in the course.");
-    checkEnrollment();
+    if (courseId) {
+      completeEnrollment(courseId);
+    }
   };
 
   const goBack = () => {
     navigate('/');
   };
+
+  // Default values for missing properties
+  const level = additionalCourseData?.level || "Beginner";
+  const outcomes = additionalCourseData?.outcomes || [];
+  const videoHours = additionalCourseData?.videoHours || courseData.duration || 0;
+  const articles = additionalCourseData?.articles || 0;
+  const resources = additionalCourseData?.resources || 0;
+  const originalPrice = additionalCourseData?.originalPrice;
+  const updatedAt = additionalCourseData?.updatedAt || "Recently";
+  const prerequisites = courseData.prerequisites || [];
+  
+  // Get demo video and materials for CourseMaterials component
+  const demoVideo = additionalCourseData?.demoVideo || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+  const materials = additionalCourseData?.materials || [];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -79,9 +99,9 @@ const CourseDetails = () => {
           {/* Course Details Section */}
           <div className="lg:col-span-2">
             <div className="mb-6">
-              {courseData.level && (
+              {level && (
                 <Badge variant="outline" className="mb-2">
-                  {courseData.level}
+                  {level}
                 </Badge>
               )}
               <h1 className="text-3xl font-bold mb-2">{courseData.title}</h1>
@@ -103,7 +123,7 @@ const CourseDetails = () => {
                 
                 <div className="flex items-center gap-1">
                   <CalendarDays className="h-4 w-4" />
-                  <span>Updated {courseData.updatedAt}</span>
+                  <span>Updated {updatedAt}</span>
                 </div>
               </div>
             </div>
@@ -120,7 +140,7 @@ const CourseDetails = () => {
                 <div>
                   <h2 className="text-xl font-semibold mb-4">What you'll learn</h2>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {courseData.outcomes.map((outcome, index) => (
+                    {outcomes.map((outcome, index) => (
                       <li key={index} className="flex items-start gap-2">
                         <CheckCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                         <span>{outcome}</span>
@@ -174,7 +194,7 @@ const CourseDetails = () => {
                 <div>
                   <h2 className="text-xl font-semibold mb-4">Requirements</h2>
                   <ul className="list-disc pl-5 space-y-2">
-                    {courseData.prerequisites.map((prereq, index) => (
+                    {prerequisites.map((prereq, index) => (
                       <li key={index}>{prereq}</li>
                     ))}
                   </ul>
@@ -182,7 +202,7 @@ const CourseDetails = () => {
               </TabsContent>
               
               <TabsContent value="materials">
-                <CourseMaterials courseId={courseId || ""} />
+                <CourseMaterials materials={materials} demoVideo={demoVideo} />
               </TabsContent>
               
               <TabsContent value="live-sessions">
@@ -205,9 +225,9 @@ const CourseDetails = () => {
                   ) : (
                     <>
                       ${courseData.price}
-                      {courseData.originalPrice && (
+                      {originalPrice && (
                         <span className="text-muted-foreground line-through ml-2 text-base">
-                          ${courseData.originalPrice}
+                          ${originalPrice}
                         </span>
                       )}
                     </>
@@ -233,15 +253,15 @@ const CourseDetails = () => {
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <Video className="h-4 w-4 text-muted-foreground" />
-                      <span>{courseData.videoHours} hours on-demand video</span>
+                      <span>{videoHours} hours on-demand video</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-muted-foreground" />
-                      <span>{courseData.articles} articles</span>
+                      <span>{articles} articles</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Download className="h-4 w-4 text-muted-foreground" />
-                      <span>{courseData.resources} downloadable resources</span>
+                      <span>{resources} downloadable resources</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-muted-foreground" />
