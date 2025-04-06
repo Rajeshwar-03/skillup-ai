@@ -1,51 +1,97 @@
 
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
-import { Button } from "../ui/button";
-import { useState } from "react";
+import { useMobile } from "@/hooks/use-mobile";
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSubmit: (message: string) => void;
   isLoading: boolean;
+  onTypingStateChange?: (isTyping: boolean) => void;
 }
 
-export const ChatInput = ({ 
-  onSendMessage, 
-  isLoading
-}: ChatInputProps) => {
+export const ChatInput = ({ onSubmit, isLoading, onTypingStateChange }: ChatInputProps) => {
   const [message, setMessage] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useMobile();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  useEffect(() => {
+    return () => {
+      // Clear timeout on unmount
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+    
+    // Signal that the user is typing
+    onTypingStateChange?.(true);
+    
+    // Debounce the typing state to avoid flickering animations
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    typingTimeoutRef.current = setTimeout(() => {
+      onTypingStateChange?.(false);
+    }, 800); // Stop "typing" animation 800ms after the last keystroke
+  };
+
+  const handleSubmit = () => {
+    if (!message.trim() || isLoading) return;
+    
+    onSubmit(message.trim());
+    setMessage("");
+    
+    // Clear typing state when message is sent
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    onTypingStateChange?.(false);
+    
+    // Focus back on textarea after sending
+    if (textareaRef.current) {
+      textareaRef.current.focus();
     }
   };
 
-  const handleSendMessage = () => {
-    if (!message.trim() || isLoading) return;
-    onSendMessage(message);
-    setMessage("");
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   return (
-    <div className="flex gap-4">
-      <input
-        type="text"
+    <div className="border border-input rounded-lg p-2 flex items-end gap-2 bg-background">
+      <Textarea
+        ref={textareaRef}
+        placeholder="Ask me anything about our courses..."
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyPress={handleKeyPress}
-        placeholder="Type your message in English..."
-        className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        className="min-h-10 max-h-40 resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-2"
+        autoComplete="off"
         disabled={isLoading}
       />
-
-      <Button
-        variant="default"
-        size="icon"
-        onClick={handleSendMessage}
+      <Button 
+        size={isMobile ? "icon" : "default"}
+        onClick={handleSubmit} 
         disabled={!message.trim() || isLoading}
+        className="shrink-0"
+        aria-label="Send message"
       >
-        <Send className="w-4 h-4" />
+        {isMobile ? <Send className="h-4 w-4" /> : (
+          <>
+            <Send className="h-4 w-4 mr-2" />
+            Send
+          </>
+        )}
       </Button>
     </div>
   );

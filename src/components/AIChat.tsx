@@ -1,119 +1,130 @@
 
-import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { MessageCircle, X } from "lucide-react";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { ThreeJSAnimation } from "@/components/chat/ThreeJSAnimation";
+import { sendChatRequest, saveChatMessage, ChatMessage as ChatMessageType } from "@/services/chatService";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { toast } from "sonner";
-import { ChatMessage as ChatMessageComponent } from "./chat/ChatMessage";
-import { ChatInput } from "./chat/ChatInput";
-import { ChatMessage, saveChatMessage, sendChatRequest } from "@/services/chatService";
 
 export const AIChat = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { 
-      role: "assistant", 
-      content: "Hello! I'm here to assist you with your learning journey. How can I help you today?" 
-    }
-  ]);
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const { speak, isSpeaking, stopSpeaking } = useTextToSpeech();
 
-  // Only scroll to bottom when new messages are added, not on initial load
+  // Scroll to bottom when messages change
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (messagesEndRef.current && messages.length > 1) {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    };
-    
-    // Add a small delay to ensure DOM has updated
-    const timeoutId = setTimeout(scrollToBottom, 100);
-    return () => clearTimeout(timeoutId);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleSendMessage = async (message: string) => {
-    if (!message.trim() || isLoading) return;
-
-    const userMessage = { role: "user" as const, content: message };
+    // Stop any ongoing speech when sending a new message
+    if (isSpeaking) {
+      stopSpeaking();
+    }
+    
+    // Add user message to the chat
+    const userMessage: ChatMessageType = { role: "user", content: message };
     setMessages(prev => [...prev, userMessage]);
+    
+    // Save user message
+    await saveChatMessage(message, false);
+    
+    // Show loading state
     setIsLoading(true);
-
+    
     try {
-      // Save user message
-      await saveChatMessage(userMessage.content, false)
-        .catch(error => {
-          console.error("Error saving user message:", error);
-          // Continue even if saving fails
-        });
-
-      // Get AI response
-      const response = await sendChatRequest([...messages, userMessage]);
+      // Send message to API
+      const allMessages = [...messages, userMessage];
+      const response = await sendChatRequest(allMessages);
       
-      if (response.success) {
-        const aiResponse = { 
-          role: "assistant" as const, 
-          content: response.message
-        };
+      if (response.success && response.message) {
+        // Add AI response to the chat
+        const aiMessage: ChatMessageType = { role: "assistant", content: response.message };
+        setMessages(prev => [...prev, aiMessage]);
         
-        // Save AI response
-        await saveChatMessage(aiResponse.content, true)
-          .catch(error => {
-            console.error("Error saving AI message:", error);
-            // Continue even if saving fails
-          });
+        // Save AI message
+        await saveChatMessage(response.message, true);
         
-        setMessages(prev => [...prev, aiResponse]);
+        // Read out the response
+        if (open) {
+          speak(response.message);
+        }
       } else {
-        toast.error("Failed to get a response. Please try again.");
+        throw new Error("Failed to get a response from the AI");
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      toast.error("Failed to send message. Please try again.");
+      console.error("Error in chat:", error);
+      toast.error("There was an error sending your message. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section id="chat" className="py-24 relative overflow-hidden">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="default"
+          size="icon"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
+          aria-label="Open chat"
         >
-          <h2 className="text-4xl font-bold mb-4 gradient-text">AI Learning Assistant</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Chat with our AI to get answers about your learning journey
-          </p>
-        </motion.div>
+          <MessageCircle className="h-6 w-6" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-md p-0 gap-0 flex flex-col h-full">
+        <SheetHeader className="border-b p-4 text-left">
+          <div className="flex items-center justify-between">
+            <SheetTitle>AI Learning Assistant</SheetTitle>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </SheetHeader>
 
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass rounded-2xl p-6"
-          >
-            <div className="flex flex-col h-[400px]">              
-              <div 
-                ref={messagesContainerRef} 
-                className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2"
-              >
-                {messages.map((msg, index) => (
-                  <ChatMessageComponent key={index} role={msg.role} content={msg.content} />
-                ))}
-                <div ref={messagesEndRef} />
+        <div className="flex-1 flex flex-col">
+          {/* Three.js Animation Section */}
+          <ThreeJSAnimation isTyping={isTyping} />
+
+          {/* Chat Messages Section */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                <p>Hello! I'm your AI learning assistant.</p>
+                <p>How can I help you today?</p>
               </div>
+            ) : (
+              messages.map((message, index) => (
+                <ChatMessage key={index} role={message.role} content={message.content} />
+              ))
+            )}
+            <div ref={messagesEndRef} />
+            {isLoading && (
+              <div className="flex justify-center">
+                <div className="dot-flashing"></div>
+              </div>
+            )}
+          </div>
 
-              <ChatInput 
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-              />
-            </div>
-          </motion.div>
+          {/* Chat Input Section */}
+          <div className="p-4 border-t">
+            <ChatInput 
+              onSubmit={handleSendMessage} 
+              isLoading={isLoading} 
+              onTypingStateChange={setIsTyping}
+            />
+          </div>
         </div>
-      </div>
-    </section>
+      </SheetContent>
+    </Sheet>
   );
 };
