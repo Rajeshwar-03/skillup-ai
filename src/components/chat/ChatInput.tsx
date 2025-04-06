@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -14,7 +14,7 @@ interface ChatInputProps {
 export const ChatInput = ({ onSubmit, isLoading, onTypingStateChange }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
