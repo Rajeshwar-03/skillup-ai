@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useEnrollment } from "@/hooks/useEnrollment";
 import { courses } from "@/data/coursesData";
-import { courseDetails } from "@/data/courseDetailsData";
+import { courseDetailsData } from "@/data/courseDetailsData";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Download, Play } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,13 +21,13 @@ const CourseDetails = () => {
 
   // Find course information
   const course = courses.find((c) => c.path === courseId);
-  const detail = courseDetails.find((c) => c.courseId === courseId);
+  const detail = courseDetailsData.find((c) => c.courseId === courseId);
 
   const { enrollmentStatus, isLoading, handleEnroll, completeEnrollment } = useEnrollment(courses);
 
   useEffect(() => {
     // Check if the user has access when the component mounts
-    if (courseId && enrollmentStatus[courseId]?.enrolled) {
+    if (courseId && enrollmentStatus[courseId]) {
       setAccessGranted(true);
     }
   }, [courseId, enrollmentStatus]);
@@ -42,9 +42,9 @@ const CourseDetails = () => {
     }
   };
 
-  const handlePaymentComplete = (success: boolean) => {
+  const handlePaymentComplete = (method: string) => {
     setShowPaymentModal(false);
-    if (success && course) {
+    if (method !== 'cancelled' && course) {
       completeEnrollment(course.path);
       setAccessGranted(true);
     }
@@ -98,7 +98,7 @@ const CourseDetails = () => {
               <span className="text-sm font-medium">Level:</span> {course.level}
             </div>
             <div className="bg-muted rounded-lg px-4 py-2">
-              <span className="text-sm font-medium">Duration:</span> {course.duration}
+              <span className="text-sm font-medium">Duration:</span> {detail.duration || "8 weeks"}
             </div>
             <div className="bg-muted rounded-lg px-4 py-2">
               <span className="text-sm font-medium">Students:</span> {course.students.toLocaleString()}
@@ -142,7 +142,7 @@ const CourseDetails = () => {
           </div>
         </div>
 
-        {enrollmentStatus[course.path]?.enrolled || accessGranted ? (
+        {accessGranted ? (
           <div className="space-y-8">
             <div className="p-6 bg-primary/10 rounded-xl">
               <h2 className="text-2xl font-bold mb-2">You have full access to this course!</h2>

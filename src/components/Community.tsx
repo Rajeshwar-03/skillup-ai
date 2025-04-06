@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Users, MessageSquare, Lightbulb, Calendar, Video, Globe } from "lucide-react";

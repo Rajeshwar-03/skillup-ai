@@ -1,6 +1,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Bot } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
@@ -9,7 +10,12 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ role, content }: ChatMessageProps) => {
   return (
-    <div className="flex items-start gap-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex items-start gap-4"
+    >
       <Avatar className={`w-8 h-8 ${role === "assistant" ? "bg-primary/20" : "bg-secondary/20"}`}>
         {role === "assistant" ? (
           <>
@@ -30,6 +36,6 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
       <div className={`flex-1 ${role === "assistant" ? "bg-primary/10" : "bg-secondary/10"} rounded-xl p-4`}>
         <p className="whitespace-pre-wrap">{content}</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
