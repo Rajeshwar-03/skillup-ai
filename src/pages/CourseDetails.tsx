@@ -84,6 +84,9 @@ const CourseDetails = () => {
   // Get demo video and materials for CourseMaterials component
   const demoVideo = additionalCourseData?.demoVideo || "https://www.youtube.com/embed/dQw4w9WgXcQ";
   const materials = additionalCourseData?.materials || [];
+  
+  // Define the course level from additionalCourseData
+  const courseLevel = additionalCourseData?.level || "Beginner";
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-orange-50 to-white">
@@ -103,9 +106,9 @@ const CourseDetails = () => {
           {/* Course Details Section */}
           <div className="lg:col-span-2">
             <div className="mb-6">
-              {level && (
+              {courseLevel && (
                 <Badge variant="outline" className="mb-2">
-                  {additionalCourseData?.level || "Beginner"}
+                  {courseLevel}
                 </Badge>
               )}
               <h1 className="text-3xl font-bold mb-2">{courseData.title}</h1>
