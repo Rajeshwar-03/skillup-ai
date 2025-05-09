@@ -52,7 +52,7 @@ export const CardPaymentSection = ({
       
       <div className="text-center text-xs text-muted-foreground mt-2">
         <p>We accept Visa, Mastercard, RuPay, and American Express</p>
-        <div className="flex justify-center space-x-2 mt-1">
+        <div className="flex justify-center space-x-2 mt-1 bg-gradient-to-r from-orange-50 to-amber-50 p-2 rounded">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-6 w-8 object-contain" />
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-6 w-8 object-contain" />
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/RuPay-Logo.png/1200px-RuPay-Logo.png" alt="RuPay" className="h-6 w-8 object-contain" />

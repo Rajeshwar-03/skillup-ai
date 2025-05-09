@@ -22,7 +22,7 @@ export const UpiPayment = ({ onPaymentComplete, isLoading }: UpiPaymentProps) =>
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className="bg-white p-4 rounded-lg">
+      <div className="bg-gradient-to-r from-orange-100 to-amber-100 p-4 rounded-lg">
         <img 
           src="/lovable-uploads/dac0972f-1b35-4699-8a9e-10929ec08cb4.png" 
           alt="UPI QR Code" 
@@ -77,7 +77,7 @@ export const UpiPayment = ({ onPaymentComplete, isLoading }: UpiPaymentProps) =>
       
       <Button 
         onClick={onPaymentComplete} 
-        className="w-full"
+        className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
         disabled={isLoading}
       >
         {isLoading ? 'Processing...' : "I've Completed the Payment"}

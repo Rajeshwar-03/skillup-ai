@@ -17,15 +17,16 @@ import { PaymentModal } from "@/components/payment/PaymentModal";
 import { useEnrollment } from "@/hooks/useEnrollment";
 import { toast } from "sonner";
 import { courses } from "@/data/coursesData";
+import { CourseReviewForm } from "@/components/reviews/CourseReviewForm";
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const { enrollmentStatus, isLoading: isEnrollmentLoading, completeEnrollment } = useEnrollment([
-    courseId ? { path: courseId } : { path: "" }
-  ]);
+  const { enrollmentStatus, isLoading: isEnrollmentLoading, completeEnrollment } = useEnrollment(
+    courseId ? [{ path: courseId }] : []
+  );
   
   // Find the course data
   const courseData = Object.values(courseDetailsData).find(course => course.id === courseId);
@@ -62,26 +63,30 @@ const CourseDetails = () => {
     }
   };
 
+  const handleSubmitReview = async (review: {name: string, rating: number, comment: string}) => {
+    // This function would handle submitting a review to the backend
+    toast.success("Review submitted successfully!");
+  };
+
   const goBack = () => {
     navigate('/');
   };
 
   // Default values for missing properties
-  const level = additionalCourseData?.level || "Beginner";
-  const outcomes = additionalCourseData?.outcomes || [];
+  const outcomes = additionalCourseData?.outcomes || ["Learn key concepts", "Build practical projects", "Master essential skills"];
   const videoHours = additionalCourseData?.videoHours || courseData.duration || 0;
-  const articles = additionalCourseData?.articles || 0;
-  const resources = additionalCourseData?.resources || 0;
-  const originalPrice = additionalCourseData?.originalPrice;
+  const articles = additionalCourseData?.articles || 5;
+  const resources = additionalCourseData?.resources || 3;
+  const originalPrice = additionalCourseData?.originalPrice || (courseData.price > 0 ? courseData.price + 30 : 0);
   const updatedAt = additionalCourseData?.updatedAt || "Recently";
-  const prerequisites = courseData.prerequisites || [];
+  const prerequisites = courseData.prerequisites || ["Basic understanding of the subject", "Computer with internet access"];
   
   // Get demo video and materials for CourseMaterials component
   const demoVideo = additionalCourseData?.demoVideo || "https://www.youtube.com/embed/dQw4w9WgXcQ";
   const materials = additionalCourseData?.materials || [];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-orange-50 to-white">
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -100,7 +105,7 @@ const CourseDetails = () => {
             <div className="mb-6">
               {level && (
                 <Badge variant="outline" className="mb-2">
-                  {level}
+                  {additionalCourseData?.level || "Beginner"}
                 </Badge>
               )}
               <h1 className="text-3xl font-bold mb-2">{courseData.title}</h1>
@@ -209,14 +214,22 @@ const CourseDetails = () => {
               </TabsContent>
               
               <TabsContent value="reviews">
-                <CourseReviews courseId={courseId || ""} />
+                <div className="space-y-8">
+                  {isEnrolled && (
+                    <CourseReviewForm 
+                      courseId={courseId || ""}
+                      onSubmitReview={handleSubmitReview}
+                    />
+                  )}
+                  <CourseReviews courseId={courseId || ""} />
+                </div>
               </TabsContent>
             </Tabs>
           </div>
           
           {/* Enrollment Card Section */}
           <div>
-            <Card className="sticky top-20 backdrop-blur-sm bg-white/80 border border-purple-100 shadow-lg">
+            <Card className="sticky top-20 backdrop-blur-sm bg-white/80 border border-orange-100 shadow-lg">
               <CardHeader>
                 <CardTitle>
                   {courseData.price === 0 ? (
@@ -241,7 +254,7 @@ const CourseDetails = () => {
                 ) : (
                   <Button 
                     onClick={() => setIsPaymentModalOpen(true)} 
-                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                    className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
                   >
                     {courseData.price === 0 ? "Enroll Now" : "Buy Now"}
                   </Button>

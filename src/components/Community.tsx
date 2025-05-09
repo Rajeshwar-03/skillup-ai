@@ -1,6 +1,7 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Users, MessageSquare, Lightbulb, Calendar, Video, Globe } from "lucide-react";
+import { Users, MessageSquare, Lightbulb, Calendar, Video, Globe, MessageCircleQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProfessorReview } from "@/types/database";
@@ -12,7 +13,7 @@ export const Community = () => {
       id: "1",
       professor_name: "Dr. Emily Chen",
       institution: "Stanford University",
-      profile_image: "/placeholder.svg",
+      profile_image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
       comment: "The course platform has been instrumental in helping my students grasp complex concepts. The interactive elements and AI assistance have significantly improved engagement and retention rates in my classes.",
       rating: 5
     },
@@ -20,7 +21,7 @@ export const Community = () => {
       id: "2",
       professor_name: "Prof. James Wilson",
       institution: "MIT",
-      profile_image: "/placeholder.svg",
+      profile_image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
       comment: "As an educator with over 20 years of experience, I'm impressed by the quality of content and the thoughtful pedagogical approach. The platform bridges theoretical knowledge with practical applications effectively.",
       rating: 4
     },
@@ -28,40 +29,65 @@ export const Community = () => {
       id: "3",
       professor_name: "Dr. Maria Rodriguez",
       institution: "UC Berkeley",
-      profile_image: "/placeholder.svg",
+      profile_image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
       comment: "The doubt clarification system is phenomenal. My students report faster learning progress and greater confidence in tackling difficult subjects when using this platform alongside traditional classroom instruction.",
       rating: 5
     }
   ]);
+  
+  const [showQuestionInput, setShowQuestionInput] = useState(false);
+  const [question, setQuestion] = useState("");
+
+  const handleAskQuestion = () => {
+    if (!showQuestionInput) {
+      setShowQuestionInput(true);
+      return;
+    }
+    
+    if (question.trim()) {
+      // Submit question logic would go here
+      toast.success("Your question has been submitted!");
+      setQuestion("");
+      setShowQuestionInput(false);
+    } else {
+      toast.error("Please enter your question");
+    }
+  };
 
   const communityFeatures = [
     {
       icon: <Users className="h-8 w-8 text-primary" />,
+      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1051&q=80",
       title: "Join a Global Network",
       description: "Connect with thousands of learners worldwide who share your passion for technology and education."
     },
     {
       icon: <MessageSquare className="h-8 w-8 text-primary" />,
+      image: "https://images.unsplash.com/photo-1513258496099-48168024aec0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
       title: "Discussion Forums",
       description: "Participate in topic-specific forums where you can ask questions, share insights, and help others."
     },
     {
       icon: <Lightbulb className="h-8 w-8 text-primary" />,
+      image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1063&q=80",
       title: "Study Groups",
       description: "Form or join study groups with peers working on the same courses or technologies."
     },
     {
       icon: <Calendar className="h-8 w-8 text-primary" />,
+      image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
       title: "Live Events",
       description: "Attend virtual workshops, hackathons, and networking sessions organized regularly."
     },
     {
       icon: <Video className="h-8 w-8 text-primary" />,
+      image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
       title: "Expert Webinars",
       description: "Join live webinars with industry experts discussing cutting-edge technologies and career advice."
     },
     {
       icon: <Globe className="h-8 w-8 text-primary" />,
+      image: "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
       title: "Job Board",
       description: "Access exclusive job opportunities and internships shared by our partner companies."
     }
@@ -112,7 +138,7 @@ export const Community = () => {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-950" id="community">
+    <section className="py-24 relative overflow-hidden bg-gradient-to-br from-orange-50 to-white" id="community">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.h2
@@ -120,7 +146,7 @@ export const Community = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl md:text-4xl font-bold mb-4"
+            className="text-3xl md:text-4xl font-bold mb-4 gradient-text"
           >
             Join Our Learning Community
           </motion.h2>
@@ -143,7 +169,7 @@ export const Community = () => {
           transition={{ duration: 0.5 }}
           className="mb-16"
         >
-          <h3 className="text-2xl font-bold mb-6 text-center">What Professors Say About Us</h3>
+          <h3 className="text-2xl font-bold mb-6 text-center gradient-text">What Professors Say About Us</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {professorReviews.map((review) => (
               <Card key={review.id} className="hover:shadow-lg transition-shadow duration-300">
@@ -174,7 +200,7 @@ export const Community = () => {
           transition={{ duration: 0.5 }}
           className="mb-16"
         >
-          <h3 className="text-2xl font-bold mb-6 text-center">Doubt Clarification System</h3>
+          <h3 className="text-2xl font-bold mb-6 text-center gradient-text">Doubt Clarification System</h3>
           <Card className="max-w-4xl mx-auto">
             <CardContent className="pt-6">
               <div className="flex flex-col md:flex-row gap-6 items-center">
@@ -197,11 +223,31 @@ export const Community = () => {
                       <span>Weekly office hours with course professors</span>
                     </li>
                   </ul>
-                  <Button className="w-full md:w-auto">Ask a Question</Button>
+                  
+                  {showQuestionInput ? (
+                    <div className="space-y-2">
+                      <textarea 
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        rows={3}
+                        placeholder="Type your question here..."
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                      ></textarea>
+                      <div className="flex gap-2">
+                        <Button onClick={handleAskQuestion}>Submit Question</Button>
+                        <Button variant="outline" onClick={() => setShowQuestionInput(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button onClick={() => setShowQuestionInput(true)}>
+                      <MessageCircleQuestion className="mr-2 h-4 w-4" />
+                      Ask a Question
+                    </Button>
+                  )}
                 </div>
                 <div className="md:w-1/3">
                   <img 
-                    src="/placeholder.svg" 
+                    src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" 
                     alt="Student getting help" 
                     className="rounded-lg shadow-md w-full"
                   />
@@ -220,9 +266,16 @@ export const Community = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+              <Card className="h-full hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                <div className="aspect-w-16 aspect-h-9 h-40 overflow-hidden">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
                 <CardHeader>
-                  <div className="mb-2">{feature.icon}</div>
+                  <div className="feature-icon mb-2">{feature.icon}</div>
                   <CardTitle>{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>

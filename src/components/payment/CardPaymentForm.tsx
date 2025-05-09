@@ -56,7 +56,7 @@ export const CardPaymentForm = ({
       
       <Button 
         onClick={onPaymentComplete} 
-        className="w-full"
+        className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
         disabled={isLoading}
       >
         {isLoading ? 'Processing...' : `Pay $${price}`}
