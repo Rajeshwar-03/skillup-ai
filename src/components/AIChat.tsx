@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -16,7 +15,7 @@ export const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
-  const { speakText, isSpeaking } = useTextToSpeech();
+  const { speakText } = useTextToSpeech();
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -26,9 +25,6 @@ export const AIChat = () => {
   }, [messages]);
 
   const handleSendMessage = async (message: string) => {
-    // Stop any ongoing speech when sending a new message
-    // No need to call stopSpeaking since we don't have that function
-    
     // Add user message to the chat
     const userMessage: ChatMessageType = { role: "user", content: message };
     setMessages(prev => [...prev, userMessage]);
@@ -45,17 +41,14 @@ export const AIChat = () => {
       const response = await sendChatRequest(allMessages);
       
       if (response.success && response.message) {
-        // Add AI response to the chat
+        // Add AI response to the chat without speaking it
         const aiMessage: ChatMessageType = { role: "assistant", content: response.message };
         setMessages(prev => [...prev, aiMessage]);
         
         // Save AI message
         await saveChatMessage(response.message, true);
         
-        // Read out the response if chat is open
-        if (open && speakText) {
-          speakText(response.message);
-        }
+        // We specifically do NOT call speakText here as requested by the user
       } else {
         throw new Error("Failed to get a response from the AI");
       }
