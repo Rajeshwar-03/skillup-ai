@@ -58,8 +58,10 @@ export const Navigation = () => {
   };
 
   const navLinks = [
-    { name: "Courses", path: "/", action: () => {} },
-    { name: "Features", path: "#features", action: () => scrollToSection("features") },
+    { name: "Courses", path: "#courses", action: () => scrollToSection("courses") },
+    { name: "Certifications", path: "#certifications", action: () => scrollToSection("certifications") },
+    { name: "Hackathons", path: "#hackathons", action: () => scrollToSection("hackathons") },
+    { name: "Events", path: "#events", action: () => scrollToSection("events") },
     { name: "Community", path: "#community", action: () => scrollToSection("community") },
   ];
 

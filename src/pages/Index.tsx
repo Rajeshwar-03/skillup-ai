@@ -5,6 +5,9 @@ import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Courses } from "@/components/Courses";
+import { Certifications } from "@/components/Certifications";
+import { Hackathons } from "@/components/Hackathons";
+import { Events } from "@/components/Events";
 import { Community } from "@/components/Community";
 import { AIChat } from "@/components/AIChat";
 import { Footer } from "@/components/Footer";
@@ -37,7 +40,12 @@ const Index = () => {
       <Navigation />
       <Hero />
       <Features />
-      <Courses />
+      <div id="courses">
+        <Courses />
+      </div>
+      <Certifications />
+      <Hackathons />
+      <Events />
       <Community />
       <AIChat />
       <Footer />
