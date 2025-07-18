@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BookOpen, Clock, FileText, Download, Star, CheckCircle2, Calendar, BarChart2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { CourseContent } from "@/components/CourseContent";
-import { CourseReviews } from "@/components/CourseReviews";
+import { CourseReviews } from "@/components/reviews/CourseReviews";
 import { Community } from "@/components/Community";
 import { checkCourseEnrollment, simulatePayment } from "@/services/chatService";
 import { toast } from "sonner";

@@ -13,6 +13,10 @@ interface Comment {
   replies?: Comment[];
 }
 
+interface CommunityProps {
+  courseId: string;
+}
+
 const initialComments: Comment[] = [
   {
     id: "1",
@@ -33,7 +37,7 @@ const initialComments: Comment[] = [
   },
 ];
 
-export const Community = () => {
+export const Community = ({ courseId }: CommunityProps) => {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
