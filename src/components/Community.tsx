@@ -14,7 +14,7 @@ interface Comment {
 }
 
 interface CommunityProps {
-  courseId: string;
+  courseId?: string;
 }
 
 const initialComments: Comment[] = [
@@ -37,7 +37,7 @@ const initialComments: Comment[] = [
   },
 ];
 
-export const Community = ({ courseId }: CommunityProps) => {
+export const Community = ({ courseId = "general" }: CommunityProps) => {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
