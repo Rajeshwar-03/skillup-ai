@@ -1,96 +1,206 @@
-
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Video } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Download, Upload, FileText, Video, Link as LinkIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-interface MaterialType {
+interface Material {
+  id: string;
   name: string;
+  type: "video" | "pdf" | "link" | "document";
   url: string;
-  type: string;
+  uploadedBy?: string;
+  uploadedAt?: string;
 }
 
 interface CourseMaterialsProps {
-  materials: MaterialType[];
-  demoVideo: string;
+  courseId: string;
+  isEnrolled: boolean;
+  isInstructor?: boolean;
 }
 
-export const CourseMaterials = ({ materials, demoVideo }: CourseMaterialsProps) => {
-  const handleDownload = (material: MaterialType) => {
-    try {
-      // Create an anchor element and set the href to the resource URL
-      const link = document.createElement('a');
-      link.href = material.url;
-      link.download = material.name;
-      link.target = "_blank";
-      
-      // Append to the document body and click
-      document.body.appendChild(link);
-      link.click();
-      
-      // Clean up
-      document.body.removeChild(link);
-      
-      toast.success(`Downloading ${material.name}`);
-    } catch (error) {
-      console.error("Download error:", error);
-      toast.error("Failed to download file");
+export const CourseMaterials = ({ courseId, isEnrolled, isInstructor = false }: CourseMaterialsProps) => {
+  const [materials, setMaterials] = useState<Material[]>([
+    {
+      id: "1",
+      name: "Course Introduction Video",
+      type: "video",
+      url: "https://example.com/intro.mp4",
+      uploadedBy: "Instructor",
+      uploadedAt: "2024-01-15"
+    },
+    {
+      id: "2", 
+      name: "Getting Started Guide",
+      type: "pdf",
+      url: "https://example.com/guide.pdf",
+      uploadedBy: "Instructor",
+      uploadedAt: "2024-01-15"
+    },
+    {
+      id: "3",
+      name: "Additional Resources",
+      type: "link",
+      url: "https://example.com/resources",
+      uploadedBy: "Instructor",
+      uploadedAt: "2024-01-16"
+    }
+  ]);
+
+  const [uploadForm, setUploadForm] = useState({
+    name: "",
+    type: "pdf" as Material["type"],
+    file: null as File | null,
+    url: ""
+  });
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadForm({ ...uploadForm, file, name: file.name });
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Video className="h-5 w-5 text-primary" />
-            Course Demo Video
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="aspect-video rounded-md overflow-hidden bg-muted">
-            <iframe
-              src={demoVideo}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-              title="Course Demo Video"
-            />
-          </div>
-        </CardContent>
-      </Card>
+  const handleUpload = () => {
+    if (!uploadForm.name) {
+      toast.error("Please provide a material name");
+      return;
+    }
 
+    const newMaterial: Material = {
+      id: Date.now().toString(),
+      name: uploadForm.name,
+      type: uploadForm.type,
+      url: uploadForm.type === "link" ? uploadForm.url : URL.createObjectURL(uploadForm.file!),
+      uploadedBy: isInstructor ? "Instructor" : "Student",
+      uploadedAt: new Date().toISOString().split('T')[0]
+    };
+
+    setMaterials([...materials, newMaterial]);
+    setUploadForm({ name: "", type: "pdf", file: null, url: "" });
+    toast.success("Material uploaded successfully!");
+  };
+
+  const getIcon = (type: Material["type"]) => {
+    switch (type) {
+      case "video": return <Video className="w-4 h-4" />;
+      case "pdf": return <FileText className="w-4 h-4" />;
+      case "link": return <LinkIcon className="w-4 h-4" />;
+      default: return <FileText className="w-4 h-4" />;
+    }
+  };
+
+  const handleDownload = (material: Material) => {
+    window.open(material.url, '_blank');
+    toast.success(`Downloading ${material.name}`);
+  };
+
+  if (!isEnrolled) {
+    return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            Course Materials
-          </CardTitle>
+          <CardTitle>Course Materials</CardTitle>
         </CardHeader>
         <CardContent>
-          {materials.length === 0 ? (
-            <p className="text-muted-foreground">No materials available for this course yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {materials.map((material, index) => (
-                <li key={index} className="flex items-center justify-between py-2 px-3 rounded-md border">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <span>{material.name}</span>
-                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                      {material.type}
-                    </span>
-                  </div>
-                  <Button size="sm" variant="outline" onClick={() => handleDownload(material)}>
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="text-muted-foreground">Enroll in this course to access materials and resources.</p>
         </CardContent>
       </Card>
-    </div>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Course Materials</CardTitle>
+        {(isInstructor || isEnrolled) && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Material
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Upload Course Material</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="material-name">Material Name</Label>
+                  <Input
+                    id="material-name"
+                    value={uploadForm.name}
+                    onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
+                    placeholder="Enter material name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="material-type">Type</Label>
+                  <select
+                    id="material-type"
+                    className="w-full p-2 border rounded-md"
+                    value={uploadForm.type}
+                    onChange={(e) => setUploadForm({ ...uploadForm, type: e.target.value as Material["type"] })}
+                  >
+                    <option value="pdf">PDF Document</option>
+                    <option value="video">Video</option>
+                    <option value="link">External Link</option>
+                    <option value="document">Document</option>
+                  </select>
+                </div>
+                {uploadForm.type === "link" ? (
+                  <div>
+                    <Label htmlFor="material-url">URL</Label>
+                    <Input
+                      id="material-url"
+                      value={uploadForm.url}
+                      onChange={(e) => setUploadForm({ ...uploadForm, url: e.target.value })}
+                      placeholder="Enter URL"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="material-file">File</Label>
+                    <Input
+                      id="material-file"
+                      type="file"
+                      onChange={handleFileUpload}
+                      accept={uploadForm.type === "video" ? "video/*" : uploadForm.type === "pdf" ? ".pdf" : "*"}
+                    />
+                  </div>
+                )}
+                <Button onClick={handleUpload} className="w-full">
+                  Upload Material
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {materials.map((material) => (
+            <div key={material.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                {getIcon(material.type)}
+                <div>
+                  <p className="font-medium">{material.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Uploaded by {material.uploadedBy} on {material.uploadedAt}
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => handleDownload(material)}>
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
