@@ -1,11 +1,8 @@
-
 import { useState, useEffect } from "react";
-import { Dialog } from "@/components/ui/dialog";
-import { DialogTrigger } from "@/components/ui/dialog";
 import { simulatePayment, checkCourseEnrollment } from "@/services/chatService";
 import { toast } from "sonner";
 import { PaymentButton } from "./payment/PaymentButton";
-import { PaymentModal } from "./payment/PaymentModal";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface PaymentOptionsProps {
   courseTitle: string;
@@ -52,46 +49,10 @@ export const PaymentOptions = ({
     checkEnrollment();
   }, [courseId, onPaymentComplete, showAccessButton, accessComplete]);
 
-  const handlePaymentSimulation = async (paymentMethod: string) => {
-    setIsLoading(true);
-    toast.success("Processing payment...");
-    
-    try {
-      const result = await simulatePayment(courseId, paymentMethod);
-      
-      if (result.success) {
-        if (result.alreadyEnrolled) {
-          toast.info("You are already enrolled in this course");
-          setOpen(false);
-          setIsEnrolled(true);
-          setAccessComplete(true);
-          onPaymentComplete(courseId);
-        } else {
-          setTimeout(() => {
-            setOpen(false);
-            toast.success("Payment successful! You now have access to the course.");
-            setIsEnrolled(true);
-            setAccessComplete(true);
-            onPaymentComplete(courseId);
-          }, 1500);
-        }
-      } else {
-        toast.error(result.message || "Payment failed");
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Payment processing failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleFreeEnrollment = () => {
     if (isEnrolled) return;
-    
     setIsLoading(true);
     toast.success("Enrolling you in this free course...");
-    
     setTimeout(() => {
       setIsEnrolled(true);
       setAccessComplete(true);
@@ -115,33 +76,36 @@ export const PaymentOptions = ({
     );
   }
 
+  const handleStripeCheckout = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: { amount: Math.round(price * 100), courseId, courseTitle }
+      });
+      if (error) throw error;
+      const url = (data as any)?.url;
+      if (url) {
+        window.location.href = url as string;
+      } else {
+        toast.error("Failed to start checkout.");
+      }
+    } catch (err) {
+      console.error("Stripe checkout error", err);
+      toast.error("Unable to start payment. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <div>
-            <PaymentButton 
-              isEnrolled={isEnrolled}
-              isChecking={isChecking}
-              price={price}
-              courseId={courseId}
-              onAccessCourse={onPaymentComplete}
-              onClick={() => setOpen(true)}
-              showAccessButton={showAccessButton}
-            />
-          </div>
-        </DialogTrigger>
-        
-        <PaymentModal 
-          open={open}
-          onOpenChange={setOpen}
-          courseTitle={courseTitle}
-          price={price}
-          courseId={courseId}
-          onPaymentComplete={handlePaymentSimulation}
-          isLoading={isLoading}
-        />
-      </Dialog>
-    </>
+    <PaymentButton 
+      isEnrolled={isEnrolled}
+      isChecking={isChecking}
+      price={price}
+      courseId={courseId}
+      onAccessCourse={onPaymentComplete}
+      onClick={price === 0 ? handleFreeEnrollment : handleStripeCheckout}
+      showAccessButton={showAccessButton}
+    />
   );
 };
