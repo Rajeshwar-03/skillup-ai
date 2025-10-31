@@ -59,27 +59,16 @@ export const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
+            <h3 className="text-lg font-semibold mb-4">Founders</h3>
             <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Help Center
-                </a>
+              <li className="text-muted-foreground">
+                BADDAM RAJESHWAR REDDY
               </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Community Guidelines
-                </a>
+              <li className="text-muted-foreground">
+                BANDARI SAI KARTHIK YADAV
               </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Terms of Service
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Privacy Policy
-                </a>
+              <li className="text-muted-foreground">
+                GURUGUBELLI DEEPAK
               </li>
             </ul>
           </motion.div>

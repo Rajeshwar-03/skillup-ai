@@ -24,7 +24,7 @@ export const UpiPayment = ({ onPaymentComplete, isLoading }: UpiPaymentProps) =>
     <div className="flex flex-col items-center space-y-4">
       <div className="bg-gradient-to-r from-orange-100 to-amber-100 p-4 rounded-lg">
         <img 
-          src="/lovable-uploads/dac0972f-1b35-4699-8a9e-10929ec08cb4.png" 
+          src="/lovable-uploads/upi-qr-code.png" 
           alt="UPI QR Code" 
           className="w-48 h-48 object-contain"
         />

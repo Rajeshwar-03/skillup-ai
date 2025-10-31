@@ -10,6 +10,9 @@ import { ArrowLeft, Book, Star, Trophy, Calendar, LogOut, Upload } from "lucide-
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { CourseRecommendations } from "@/components/CourseRecommendations";
+import { QuizzesSection } from "@/components/profile/QuizzesSection";
+import { StatisticsSection } from "@/components/profile/StatisticsSection";
+import { AssessmentSection } from "@/components/profile/AssessmentSection";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -192,6 +195,12 @@ const ProfilePage = () => {
               </div>
             </CardContent>
           </Card>
+
+          <StatisticsSection />
+
+          <QuizzesSection />
+
+          <AssessmentSection />
 
           <Card className="glass">
             <CardHeader>
