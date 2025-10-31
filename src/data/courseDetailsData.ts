@@ -679,105 +679,837 @@ export const courseDetailsData = {
     thumbnailUrl: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935",
     prerequisites: ["No programming experience required", "Basic computer skills"],
     tags: ["Python", "Programming", "Automation", "Scripting", "Beginner"]
+  },
+  "devops": {
+    id: "devops",
+    title: "DevOps & CI/CD",
+    description: "Master modern DevOps practices, continuous integration, and continuous deployment workflows.",
+    instructor: "Robert Martinez",
+    duration: 65,
+    modules: [
+      {
+        title: "DevOps Fundamentals",
+        lessons: [
+          {
+            title: "Introduction to DevOps Culture",
+            content: "Understand the DevOps philosophy and its impact on software development.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "DevOps Principles", url: "https://example.com/materials/devops-principles.pdf", type: "PDF" },
+              { name: "DevOps Roadmap", url: "https://example.com/materials/devops-roadmap.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Version Control with Git",
+            content: "Master Git workflows and collaboration strategies.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Git Commands Reference", url: "https://example.com/materials/git-reference.pdf", type: "PDF" },
+              { name: "Git Workflow Strategies", url: "https://example.com/materials/git-workflows.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "CI/CD Pipelines",
+        lessons: [
+          {
+            title: "Building CI Pipelines",
+            content: "Create automated build and test pipelines.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "CI Best Practices", url: "https://example.com/materials/ci-practices.pdf", type: "PDF" },
+              { name: "Jenkins Configuration", url: "https://example.com/materials/jenkins-config.zip", type: "ZIP" }
+            ]
+          },
+          {
+            title: "Continuous Deployment Strategies",
+            content: "Implement automated deployment workflows.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "CD Patterns", url: "https://example.com/materials/cd-patterns.pdf", type: "PDF" },
+              { name: "Deployment Scripts", url: "https://example.com/materials/deploy-scripts.zip", type: "ZIP" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Containerization & Orchestration",
+        lessons: [
+          {
+            title: "Docker Containerization",
+            content: "Learn to containerize applications with Docker.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Docker Guide", url: "https://example.com/materials/docker-guide.pdf", type: "PDF" },
+              { name: "Dockerfile Examples", url: "https://example.com/materials/dockerfiles.zip", type: "ZIP" }
+            ]
+          },
+          {
+            title: "Kubernetes Orchestration",
+            content: "Master container orchestration with Kubernetes.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Kubernetes Basics", url: "https://example.com/materials/k8s-basics.pdf", type: "PDF" },
+              { name: "K8s Manifests", url: "https://example.com/materials/k8s-manifests.zip", type: "ZIP" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 6,
+    enrollmentCount: 1500,
+    thumbnailUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+    prerequisites: ["Linux basics", "Networking fundamentals", "Basic scripting knowledge"],
+    tags: ["DevOps", "CI/CD", "Docker", "Kubernetes", "Jenkins", "Automation"]
+  },
+  "blockchain": {
+    id: "blockchain",
+    title: "Blockchain Development",
+    description: "Build decentralized applications and smart contracts on various blockchain platforms.",
+    instructor: "Alex Thompson",
+    duration: 70,
+    modules: [
+      {
+        title: "Blockchain Fundamentals",
+        lessons: [
+          {
+            title: "Understanding Blockchain Technology",
+            content: "Learn the core concepts of blockchain and distributed ledger technology.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Blockchain Basics", url: "https://example.com/materials/blockchain-basics.pdf", type: "PDF" },
+              { name: "Cryptography Fundamentals", url: "https://example.com/materials/cryptography.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Consensus Mechanisms",
+            content: "Explore different consensus algorithms and their applications.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Consensus Algorithms", url: "https://example.com/materials/consensus.pdf", type: "PDF" },
+              { name: "PoW vs PoS", url: "https://example.com/materials/pow-pos.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Smart Contract Development",
+        lessons: [
+          {
+            title: "Solidity Programming",
+            content: "Master Solidity for Ethereum smart contract development.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Solidity Guide", url: "https://example.com/materials/solidity-guide.pdf", type: "PDF" },
+              { name: "Smart Contract Examples", url: "https://example.com/materials/contracts.zip", type: "ZIP" }
+            ]
+          },
+          {
+            title: "Smart Contract Security",
+            content: "Learn security best practices for smart contracts.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Security Patterns", url: "https://example.com/materials/security-patterns.pdf", type: "PDF" },
+              { name: "Audit Checklist", url: "https://example.com/materials/audit-checklist.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "DApp Development",
+        lessons: [
+          {
+            title: "Building Decentralized Applications",
+            content: "Create full-stack decentralized applications.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "DApp Architecture", url: "https://example.com/materials/dapp-arch.pdf", type: "PDF" },
+              { name: "Web3.js Tutorial", url: "https://example.com/materials/web3js.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Deploying on Blockchain Networks",
+            content: "Deploy and test your DApps on various networks.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Deployment Guide", url: "https://example.com/materials/deployment.pdf", type: "PDF" },
+              { name: "Testing Strategies", url: "https://example.com/materials/testing.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 6,
+    enrollmentCount: 1200,
+    thumbnailUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0",
+    prerequisites: ["JavaScript programming", "Web development basics", "Understanding of cryptography"],
+    tags: ["Blockchain", "Smart Contracts", "Solidity", "Ethereum", "DApp", "Web3"]
+  },
+  "data-science": {
+    id: "data-science",
+    title: "Data Science",
+    description: "Master data analysis, visualization, and machine learning for data-driven decision making.",
+    instructor: "Dr. Lisa Anderson",
+    duration: 68,
+    modules: [
+      {
+        title: "Data Analysis Fundamentals",
+        lessons: [
+          {
+            title: "Python for Data Science",
+            content: "Learn Python libraries essential for data science.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "NumPy & Pandas Guide", url: "https://example.com/materials/numpy-pandas.pdf", type: "PDF" },
+              { name: "Python Data Science Setup", url: "https://example.com/materials/ds-setup.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Data Cleaning and Preprocessing",
+            content: "Master techniques for cleaning and preparing data.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Data Cleaning Techniques", url: "https://example.com/materials/data-cleaning.pdf", type: "PDF" },
+              { name: "Preprocessing Scripts", url: "https://example.com/materials/preprocessing.zip", type: "ZIP" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Data Visualization",
+        lessons: [
+          {
+            title: "Visualization with Matplotlib & Seaborn",
+            content: "Create compelling visualizations with Python libraries.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Visualization Guide", url: "https://example.com/materials/viz-guide.pdf", type: "PDF" },
+              { name: "Chart Examples", url: "https://example.com/materials/chart-examples.ipynb", type: "IPYNB" }
+            ]
+          },
+          {
+            title: "Interactive Dashboards",
+            content: "Build interactive data dashboards.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Dashboard Design", url: "https://example.com/materials/dashboard-design.pdf", type: "PDF" },
+              { name: "Plotly Tutorial", url: "https://example.com/materials/plotly.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Statistical Analysis & ML",
+        lessons: [
+          {
+            title: "Statistical Methods",
+            content: "Apply statistical methods to data analysis.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Statistics for Data Science", url: "https://example.com/materials/statistics.pdf", type: "PDF" },
+              { name: "Statistical Tests", url: "https://example.com/materials/stat-tests.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Machine Learning Models",
+            content: "Build and evaluate machine learning models.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "ML Model Guide", url: "https://example.com/materials/ml-models.pdf", type: "PDF" },
+              { name: "Scikit-learn Examples", url: "https://example.com/materials/sklearn.zip", type: "ZIP" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 3,
+    enrollmentCount: 2200,
+    thumbnailUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+    prerequisites: ["Python programming", "Basic statistics", "Mathematics fundamentals"],
+    tags: ["Data Science", "Python", "Data Analysis", "Visualization", "Statistics", "Machine Learning"]
+  },
+  "cybersecurity": {
+    id: "cybersecurity",
+    title: "Cybersecurity",
+    description: "Learn ethical hacking, penetration testing, and security best practices to protect systems.",
+    instructor: "James Wilson",
+    duration: 75,
+    modules: [
+      {
+        title: "Security Fundamentals",
+        lessons: [
+          {
+            title: "Introduction to Cybersecurity",
+            content: "Understand the cybersecurity landscape and threat models.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Cybersecurity Overview", url: "https://example.com/materials/cybersec-overview.pdf", type: "PDF" },
+              { name: "Threat Landscape", url: "https://example.com/materials/threats.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Network Security Basics",
+            content: "Learn fundamental network security concepts.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Network Security Guide", url: "https://example.com/materials/network-sec.pdf", type: "PDF" },
+              { name: "Firewall Configuration", url: "https://example.com/materials/firewall.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Ethical Hacking",
+        lessons: [
+          {
+            title: "Penetration Testing Methodology",
+            content: "Master the systematic approach to penetration testing.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Pentest Methodology", url: "https://example.com/materials/pentest-method.pdf", type: "PDF" },
+              { name: "Testing Tools", url: "https://example.com/materials/pentest-tools.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Vulnerability Assessment",
+            content: "Learn to identify and assess system vulnerabilities.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Vulnerability Scanning", url: "https://example.com/materials/vuln-scan.pdf", type: "PDF" },
+              { name: "Assessment Templates", url: "https://example.com/materials/assessment.zip", type: "ZIP" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Security Operations",
+        lessons: [
+          {
+            title: "Security Monitoring & SIEM",
+            content: "Implement security monitoring and incident detection.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "SIEM Guide", url: "https://example.com/materials/siem-guide.pdf", type: "PDF" },
+              { name: "Log Analysis", url: "https://example.com/materials/log-analysis.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Incident Response",
+            content: "Learn to respond to and recover from security incidents.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Incident Response Plan", url: "https://example.com/materials/ir-plan.pdf", type: "PDF" },
+              { name: "Forensics Basics", url: "https://example.com/materials/forensics.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 6,
+    enrollmentCount: 1600,
+    thumbnailUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b",
+    prerequisites: ["Networking fundamentals", "Linux basics", "Understanding of IT systems"],
+    tags: ["Cybersecurity", "Ethical Hacking", "Penetration Testing", "Security", "Network Security"]
+  },
+  "mobile-dev": {
+    id: "mobile-dev",
+    title: "Mobile App Development",
+    description: "Build cross-platform mobile applications using React Native for iOS and Android.",
+    instructor: "Maria Garcia",
+    duration: 58,
+    modules: [
+      {
+        title: "React Native Fundamentals",
+        lessons: [
+          {
+            title: "Getting Started with React Native",
+            content: "Set up your development environment and create your first app.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "React Native Setup", url: "https://example.com/materials/rn-setup.pdf", type: "PDF" },
+              { name: "Environment Configuration", url: "https://example.com/materials/env-config.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "React Native Components",
+            content: "Learn to build UIs with React Native components.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Component Library", url: "https://example.com/materials/components.pdf", type: "PDF" },
+              { name: "UI Patterns", url: "https://example.com/materials/ui-patterns.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Mobile App Features",
+        lessons: [
+          {
+            title: "Navigation in Mobile Apps",
+            content: "Implement navigation patterns for mobile applications.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Navigation Guide", url: "https://example.com/materials/navigation.pdf", type: "PDF" },
+              { name: "React Navigation", url: "https://example.com/materials/react-nav.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Working with APIs",
+            content: "Integrate REST APIs and handle data in mobile apps.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "API Integration", url: "https://example.com/materials/api-integration.pdf", type: "PDF" },
+              { name: "Fetch & Axios", url: "https://example.com/materials/fetch-axios.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Publishing & Deployment",
+        lessons: [
+          {
+            title: "Building for Production",
+            content: "Prepare your app for production deployment.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Production Build Guide", url: "https://example.com/materials/prod-build.pdf", type: "PDF" },
+              { name: "Optimization Tips", url: "https://example.com/materials/optimization.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "App Store Submission",
+            content: "Learn to publish apps on Google Play and App Store.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "App Store Guidelines", url: "https://example.com/materials/app-store.pdf", type: "PDF" },
+              { name: "Submission Checklist", url: "https://example.com/materials/submission.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 3,
+    enrollmentCount: 2800,
+    thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c",
+    prerequisites: ["JavaScript fundamentals", "React basics", "Mobile development interest"],
+    tags: ["Mobile Development", "React Native", "iOS", "Android", "Cross-Platform", "JavaScript"]
+  },
+  "digital-marketing": {
+    id: "digital-marketing",
+    title: "Digital Marketing",
+    description: "Master SEO, social media marketing, content marketing, and analytics for digital success.",
+    instructor: "Jennifer Lee",
+    duration: 52,
+    modules: [
+      {
+        title: "Digital Marketing Fundamentals",
+        lessons: [
+          {
+            title: "Introduction to Digital Marketing",
+            content: "Understand the digital marketing ecosystem and strategies.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Digital Marketing Overview", url: "https://example.com/materials/dm-overview.pdf", type: "PDF" },
+              { name: "Marketing Channels", url: "https://example.com/materials/channels.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Marketing Strategy Development",
+            content: "Learn to create effective marketing strategies.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Strategy Framework", url: "https://example.com/materials/strategy.pdf", type: "PDF" },
+              { name: "Customer Personas", url: "https://example.com/materials/personas.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "SEO & Content Marketing",
+        lessons: [
+          {
+            title: "Search Engine Optimization",
+            content: "Master SEO techniques to improve search rankings.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "SEO Best Practices", url: "https://example.com/materials/seo-practices.pdf", type: "PDF" },
+              { name: "Keyword Research", url: "https://example.com/materials/keywords.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Content Marketing Strategy",
+            content: "Create compelling content that drives engagement.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Content Strategy", url: "https://example.com/materials/content-strategy.pdf", type: "PDF" },
+              { name: "Content Calendar", url: "https://example.com/materials/calendar.xlsx", type: "XLSX" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Social Media & Analytics",
+        lessons: [
+          {
+            title: "Social Media Marketing",
+            content: "Build effective social media campaigns.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Social Media Guide", url: "https://example.com/materials/social-media.pdf", type: "PDF" },
+              { name: "Platform Strategies", url: "https://example.com/materials/platforms.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Analytics & Reporting",
+            content: "Measure and analyze marketing performance.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Google Analytics Guide", url: "https://example.com/materials/analytics.pdf", type: "PDF" },
+              { name: "KPI Dashboard", url: "https://example.com/materials/kpi-dashboard.xlsx", type: "XLSX" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 0,
+    enrollmentCount: 2600,
+    thumbnailUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+    prerequisites: ["No prior experience required", "Basic internet knowledge", "Marketing interest"],
+    tags: ["Digital Marketing", "SEO", "Social Media", "Content Marketing", "Analytics", "Marketing Strategy"]
+  },
+  "iot": {
+    id: "iot",
+    title: "IoT Development",
+    description: "Build smart devices and Internet of Things solutions with sensors, microcontrollers, and cloud integration.",
+    instructor: "Kevin Zhang",
+    duration: 62,
+    modules: [
+      {
+        title: "IoT Fundamentals",
+        lessons: [
+          {
+            title: "Introduction to IoT",
+            content: "Understand IoT architecture and ecosystem.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "IoT Overview", url: "https://example.com/materials/iot-overview.pdf", type: "PDF" },
+              { name: "IoT Protocols", url: "https://example.com/materials/iot-protocols.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Microcontrollers & Sensors",
+            content: "Learn to work with Arduino, Raspberry Pi, and sensors.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Hardware Guide", url: "https://example.com/materials/hardware.pdf", type: "PDF" },
+              { name: "Sensor Interfacing", url: "https://example.com/materials/sensors.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "IoT Communication",
+        lessons: [
+          {
+            title: "MQTT & IoT Protocols",
+            content: "Implement communication protocols for IoT devices.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "MQTT Tutorial", url: "https://example.com/materials/mqtt.pdf", type: "PDF" },
+              { name: "Protocol Comparison", url: "https://example.com/materials/protocol-comp.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Cloud Integration",
+            content: "Connect IoT devices to cloud platforms.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Cloud Platforms", url: "https://example.com/materials/cloud-platforms.pdf", type: "PDF" },
+              { name: "AWS IoT Guide", url: "https://example.com/materials/aws-iot.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "IoT Applications",
+        lessons: [
+          {
+            title: "Smart Home Systems",
+            content: "Build home automation solutions.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Smart Home Architecture", url: "https://example.com/materials/smart-home.pdf", type: "PDF" },
+              { name: "Home Automation Code", url: "https://example.com/materials/home-auto.zip", type: "ZIP" }
+            ]
+          },
+          {
+            title: "Industrial IoT",
+            content: "Explore industrial IoT applications and use cases.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "IIoT Overview", url: "https://example.com/materials/iiot.pdf", type: "PDF" },
+              { name: "Industry 4.0", url: "https://example.com/materials/industry40.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 6,
+    enrollmentCount: 1100,
+    thumbnailUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    prerequisites: ["Basic electronics", "Programming fundamentals", "Understanding of networking"],
+    tags: ["IoT", "Internet of Things", "Embedded Systems", "Arduino", "Raspberry Pi", "Sensors"]
+  },
+  "game-dev": {
+    id: "game-dev",
+    title: "Game Development",
+    description: "Create engaging games using Unity game engine and C# programming.",
+    instructor: "Chris Morgan",
+    duration: 64,
+    modules: [
+      {
+        title: "Unity Basics",
+        lessons: [
+          {
+            title: "Getting Started with Unity",
+            content: "Learn the Unity interface and basic game development concepts.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Unity Installation", url: "https://example.com/materials/unity-install.pdf", type: "PDF" },
+              { name: "Unity Interface Guide", url: "https://example.com/materials/unity-interface.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "C# for Unity",
+            content: "Master C# programming for game development.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "C# Basics", url: "https://example.com/materials/csharp-basics.pdf", type: "PDF" },
+              { name: "Unity Scripting", url: "https://example.com/materials/unity-scripting.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Game Mechanics",
+        lessons: [
+          {
+            title: "Physics and Collisions",
+            content: "Implement game physics and collision detection.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Physics in Unity", url: "https://example.com/materials/unity-physics.pdf", type: "PDF" },
+              { name: "Collision Examples", url: "https://example.com/materials/collisions.zip", type: "ZIP" }
+            ]
+          },
+          {
+            title: "Animation Systems",
+            content: "Create smooth animations for game characters.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Animation Guide", url: "https://example.com/materials/animation.pdf", type: "PDF" },
+              { name: "Animator Controller", url: "https://example.com/materials/animator.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Game Production",
+        lessons: [
+          {
+            title: "UI/UX for Games",
+            content: "Design intuitive game interfaces and experiences.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Game UI Design", url: "https://example.com/materials/game-ui.pdf", type: "PDF" },
+              { name: "UX Best Practices", url: "https://example.com/materials/game-ux.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Publishing Your Game",
+            content: "Learn to build and publish games on various platforms.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Build Settings", url: "https://example.com/materials/build-settings.pdf", type: "PDF" },
+              { name: "Publishing Guide", url: "https://example.com/materials/publishing.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 3,
+    enrollmentCount: 1900,
+    thumbnailUrl: "https://images.unsplash.com/photo-1556438064-2d7646166914",
+    prerequisites: ["Basic programming knowledge", "Computer graphics interest", "Creative mindset"],
+    tags: ["Game Development", "Unity", "C#", "3D Graphics", "Game Design", "Animation"]
+  },
+  "cloud-native": {
+    id: "cloud-native",
+    title: "Cloud Native Development",
+    description: "Master cloud-native architecture patterns, Kubernetes orchestration, and microservices.",
+    instructor: "Steven Clark",
+    duration: 70,
+    modules: [
+      {
+        title: "Cloud Native Fundamentals",
+        lessons: [
+          {
+            title: "Introduction to Cloud Native",
+            content: "Understand cloud-native principles and architecture.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Cloud Native Principles", url: "https://example.com/materials/cn-principles.pdf", type: "PDF" },
+              { name: "12-Factor App", url: "https://example.com/materials/12factor.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Microservices Architecture",
+            content: "Learn to design and implement microservices.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Microservices Patterns", url: "https://example.com/materials/ms-patterns.pdf", type: "PDF" },
+              { name: "Service Design", url: "https://example.com/materials/service-design.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Kubernetes Deep Dive",
+        lessons: [
+          {
+            title: "Kubernetes Architecture",
+            content: "Master Kubernetes components and architecture.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "K8s Architecture", url: "https://example.com/materials/k8s-arch.pdf", type: "PDF" },
+              { name: "Cluster Setup", url: "https://example.com/materials/cluster-setup.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Advanced Kubernetes",
+            content: "Implement advanced K8s patterns and operators.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "K8s Operators", url: "https://example.com/materials/operators.pdf", type: "PDF" },
+              { name: "Helm Charts", url: "https://example.com/materials/helm.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Service Mesh & Observability",
+        lessons: [
+          {
+            title: "Service Mesh with Istio",
+            content: "Implement service mesh for microservices communication.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Istio Guide", url: "https://example.com/materials/istio.pdf", type: "PDF" },
+              { name: "Traffic Management", url: "https://example.com/materials/traffic-mgmt.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Observability & Monitoring",
+            content: "Implement comprehensive monitoring and logging.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Observability Stack", url: "https://example.com/materials/observability.pdf", type: "PDF" },
+              { name: "Prometheus & Grafana", url: "https://example.com/materials/prom-grafana.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 6,
+    enrollmentCount: 1400,
+    thumbnailUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
+    prerequisites: ["Docker knowledge", "Linux fundamentals", "Networking basics", "Programming experience"],
+    tags: ["Cloud Native", "Kubernetes", "Microservices", "Docker", "Service Mesh", "DevOps"]
+  },
+  "data-engineering": {
+    id: "data-engineering",
+    title: "Data Engineering",
+    description: "Build robust data pipelines, data warehouses, and infrastructure for large-scale data processing.",
+    instructor: "Dr. Amanda Roberts",
+    duration: 72,
+    modules: [
+      {
+        title: "Data Engineering Foundations",
+        lessons: [
+          {
+            title: "Introduction to Data Engineering",
+            content: "Understand the role and responsibilities of data engineers.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "Data Engineering Overview", url: "https://example.com/materials/de-overview.pdf", type: "PDF" },
+              { name: "Data Architecture", url: "https://example.com/materials/data-arch.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Data Modeling",
+            content: "Learn to design effective data models.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Data Modeling Guide", url: "https://example.com/materials/data-modeling.pdf", type: "PDF" },
+              { name: "Schema Design", url: "https://example.com/materials/schema-design.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Data Pipeline Development",
+        lessons: [
+          {
+            title: "ETL/ELT Processes",
+            content: "Build efficient ETL and ELT pipelines.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "ETL Best Practices", url: "https://example.com/materials/etl-practices.pdf", type: "PDF" },
+              { name: "Apache Airflow", url: "https://example.com/materials/airflow.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Stream Processing",
+            content: "Implement real-time data processing pipelines.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Stream Processing Guide", url: "https://example.com/materials/stream-processing.pdf", type: "PDF" },
+              { name: "Apache Kafka", url: "https://example.com/materials/kafka.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Data Warehousing & Analytics",
+        lessons: [
+          {
+            title: "Data Warehouse Design",
+            content: "Design and implement data warehouses.",
+            videoUrl: videoUrls.default[0],
+            materials: [
+              { name: "DW Architecture", url: "https://example.com/materials/dw-arch.pdf", type: "PDF" },
+              { name: "Star Schema Design", url: "https://example.com/materials/star-schema.pdf", type: "PDF" }
+            ]
+          },
+          {
+            title: "Big Data Technologies",
+            content: "Work with Spark, Hadoop, and other big data tools.",
+            videoUrl: videoUrls.default[1],
+            materials: [
+              { name: "Apache Spark Guide", url: "https://example.com/materials/spark.pdf", type: "PDF" },
+              { name: "Big Data Ecosystem", url: "https://example.com/materials/big-data.pdf", type: "PDF" }
+            ]
+          }
+        ]
+      }
+    ],
+    price: 6,
+    enrollmentCount: 1300,
+    thumbnailUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+    prerequisites: ["SQL proficiency", "Python programming", "Database fundamentals", "Cloud platform knowledge"],
+    tags: ["Data Engineering", "ETL", "Data Pipelines", "Big Data", "Spark", "Data Warehousing"]
   }
 };
-
-// Generate course details for other courses using a default template
-courses.forEach(course => {
-  if (!courseDetailsData[course.path]) {
-    courseDetailsData[course.path] = {
-      id: course.path,
-      title: course.title,
-      description: course.description,
-      instructor: "Expert Instructor",
-      duration: 40 + Math.floor(Math.random() * 30),
-      modules: [
-        {
-          title: `Introduction to ${course.title}`,
-          lessons: [
-            {
-              title: "Getting Started",
-              content: `Learn the basics of ${course.title}.`,
-              videoUrl: videoUrls.default[0],
-              materials: [
-                {
-                  name: "Course Overview",
-                  url: "https://example.com/materials/overview.pdf",
-                  type: "PDF"
-                },
-                {
-                  name: "Getting Started Guide",
-                  url: "https://example.com/materials/getting-started.pdf",
-                  type: "PDF"
-                }
-              ]
-            },
-            {
-              title: "Core Concepts",
-              content: `Understand the fundamental concepts of ${course.title}.`,
-              videoUrl: videoUrls.default[1],
-              materials: [
-                {
-                  name: "Core Concepts Guide",
-                  url: "https://example.com/materials/core-concepts.pdf",
-                  type: "PDF"
-                },
-                {
-                  name: "Practice Exercises",
-                  url: "https://example.com/materials/exercises.zip",
-                  type: "ZIP"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          title: "Intermediate Topics",
-          lessons: [
-            {
-              title: "Advanced Techniques",
-              content: `Explore advanced techniques in ${course.title}.`,
-              videoUrl: videoUrls.default[0],
-              materials: [
-                {
-                  name: "Advanced Guide",
-                  url: "https://example.com/materials/advanced.pdf",
-                  type: "PDF"
-                },
-                {
-                  name: "Example Projects",
-                  url: "https://example.com/materials/projects.zip",
-                  type: "ZIP"
-                }
-              ]
-            },
-            {
-              title: "Best Practices",
-              content: `Learn industry best practices for ${course.title}.`,
-              videoUrl: videoUrls.default[1],
-              materials: [
-                {
-                  name: "Best Practices Guide",
-                  url: "https://example.com/materials/best-practices.pdf",
-                  type: "PDF"
-                },
-                {
-                  name: "Code Examples",
-                  url: "https://example.com/materials/code-examples.zip",
-                  type: "ZIP"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      price: course.price,
-      enrollmentCount: course.students,
-      thumbnailUrl: course.image,
-      prerequisites: ["Basic knowledge in the field", "Enthusiasm to learn"],
-      tags: course.title.split(" ").concat(["Online Course", "SkillUp AI"])
-    };
-  }
-});
 
 export default courseDetailsData;
