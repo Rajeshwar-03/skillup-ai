@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { PlayCircle, FileText, CheckCircle2, Lock } from "lucide-react";
+import { courseDetailsData } from "@/data/courseDetailsData";
 
 interface CourseContentProps {
   courseId: string;
@@ -12,41 +13,41 @@ interface CourseContentProps {
 
 export const CourseContent = ({ courseId, isEnrolled }: CourseContentProps) => {
   const [progress, setProgress] = useState(0);
+  const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set([1, 2]));
 
-  // Mock course content data
-  const courseModules = [
-    {
-      id: 1,
-      title: "Introduction to the Course",
-      lessons: [
-        { id: 1, title: "Welcome & Overview", type: "video", duration: "5 min", completed: true },
-        { id: 2, title: "Course Materials", type: "article", duration: "3 min", completed: true },
-      ]
-    },
-    {
-      id: 2,
-      title: "Fundamentals",
-      lessons: [
-        { id: 3, title: "Basic Concepts", type: "video", duration: "15 min", completed: false },
-        { id: 4, title: "Practical Examples", type: "video", duration: "20 min", completed: false },
-        { id: 5, title: "Exercise 1", type: "exercise", duration: "30 min", completed: false },
-      ]
-    },
-    {
-      id: 3,
-      title: "Advanced Topics",
-      lessons: [
-        { id: 6, title: "Deep Dive", type: "video", duration: "25 min", completed: false },
-        { id: 7, title: "Case Study", type: "article", duration: "10 min", completed: false },
-      ]
-    }
-  ];
+  // Get course data from courseDetailsData
+  const courseData = courseDetailsData[courseId as keyof typeof courseDetailsData];
+  
+  // Transform the data structure to match our component needs
+  const courseModules = courseData?.modules.map((module, index) => ({
+    id: index + 1,
+    title: module.title,
+    lessons: module.lessons.map((lesson, lessonIndex) => ({
+      id: index * 100 + lessonIndex + 1,
+      title: lesson.title,
+      type: lesson.videoUrl ? "video" : "article",
+      duration: "15 min",
+      completed: completedLessons.has(index * 100 + lessonIndex + 1),
+      videoUrl: lesson.videoUrl,
+      content: lesson.content
+    }))
+  })) || [];
 
   useEffect(() => {
-    const completedLessons = courseModules.flatMap(m => m.lessons).filter(l => l.completed).length;
+    const completed = courseModules.flatMap(m => m.lessons).filter(l => l.completed).length;
     const totalLessons = courseModules.flatMap(m => m.lessons).length;
-    setProgress((completedLessons / totalLessons) * 100);
-  }, []);
+    setProgress(totalLessons > 0 ? (completed / totalLessons) * 100 : 0);
+  }, [courseModules, completedLessons]);
+
+  const handleLessonClick = (lessonId: number) => {
+    if (isEnrolled) {
+      setCompletedLessons(prev => {
+        const newSet = new Set(prev);
+        newSet.add(lessonId);
+        return newSet;
+      });
+    }
+  };
 
   const getLessonIcon = (type: string, completed: boolean) => {
     if (completed) return <CheckCircle2 className="h-5 w-5 text-green-500" />;
@@ -103,7 +104,11 @@ export const CourseContent = ({ courseId, isEnrolled }: CourseContentProps) => {
                         </div>
                       </div>
                       {isEnrolled ? (
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleLessonClick(lesson.id)}
+                        >
                           {lesson.completed ? "Review" : "Start"}
                         </Button>
                       ) : (

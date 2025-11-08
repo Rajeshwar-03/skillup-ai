@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, Users, Clock, BookOpen, Award, DollarSign, Calendar, Video, MessageSquare, Trophy } from "lucide-react";
+import { Star, Users, Clock, BookOpen, Award, DollarSign, Calendar, Video, MessageSquare, Trophy, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { checkCourseEnrollment, simulatePayment } from "@/services/chatService";
 import { Layout } from "@/components/Layout";
@@ -38,6 +38,7 @@ const getCourseDataWithDefaults = (course: any): any => {
 
 const CourseDetails = () => {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const [courseData, setCourseData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [enrollmentStatus, setEnrollmentStatus] = useState(false);
@@ -121,6 +122,16 @@ const CourseDetails = () => {
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
         <div className="container mx-auto px-4 py-8">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            className="mb-6"
+            onClick={() => navigate('/courses')}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Courses
+          </Button>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
