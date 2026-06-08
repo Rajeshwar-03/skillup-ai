@@ -53,8 +53,9 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('text-to-speech error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'An error occurred. Please try again.' }),
       {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

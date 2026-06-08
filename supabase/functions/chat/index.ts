@@ -15,10 +15,10 @@ serve(async (req) => {
 
   try {
     const requestData = await req.json();
-    const { messages, action, courseId, courseTitle, price, apiKey } = requestData;
-    
-    // Use provided API key or fall back to environment variable
-    const openAIApiKey = apiKey || Deno.env.get('OPENAI_API_KEY');
+    const { messages, action, courseId, courseTitle, price } = requestData;
+
+    // Always use server-side env key; never accept client-supplied credentials
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
 
     // Add more detailed logging for debugging
@@ -195,33 +195,10 @@ serve(async (req) => {
     }
   } catch (error) {
     console.error('Error in chat function:', error);
-    
-    if (!Deno.env.get('OPENAI_API_KEY')) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'OpenAI API key not found. Please contact support.',
-          details: 'Missing API key'
-        }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-    
-    const errorMessage = error.message.includes('rate limit') || error.message.includes('quota') ?
-      'OpenAI API rate limit or quota exceeded. Please try again later.' :
-      'An unexpected error occurred while processing your request.';
-    
+    const isRate = typeof error?.message === 'string' && (error.message.includes('rate limit') || error.message.includes('quota'));
     return new Response(
-      JSON.stringify({ 
-        error: errorMessage,
-        details: error.message
-      }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      JSON.stringify({ error: isRate ? 'Service temporarily unavailable. Please try again later.' : 'An error occurred. Please try again.' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
