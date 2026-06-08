@@ -47,20 +47,20 @@ export const CourseMaterials = ({ courseId, isEnrolled, isInstructor = false }: 
         const basePath = `${user.id}/${courseId}`;
         const { data, error } = await supabase.storage.from("course-materials").list(basePath, { limit: 100, sortBy: { column: "name", order: "asc" } });
         if (error) throw error;
-        const mapped: Material[] = (data || [])
+        const mapped: Material[] = await Promise.all((data || [])
           .filter((f) => f.name)
-          .map((f) => {
+          .map(async (f) => {
             const path = `${basePath}/${f.name}`;
-            const { data: pub } = supabase.storage.from("course-materials").getPublicUrl(path);
+            const { data: signed } = await supabase.storage.from("course-materials").createSignedUrl(path, 3600);
             return {
               id: path,
               name: f.name,
               type: detectType(f.name),
-              url: pub.publicUrl,
+              url: signed?.signedUrl || "",
               uploadedBy: isInstructor ? "Instructor" : "You",
               uploadedAt: new Date(f.created_at || Date.now()).toISOString().split("T")[0]
             } as Material;
-          });
+          }));
         setMaterials(mapped);
       } catch (e) {
         console.error("Failed to load materials", e);
@@ -114,12 +114,12 @@ export const CourseMaterials = ({ courseId, isEnrolled, isInstructor = false }: 
       const { error: uploadError } = await supabase.storage.from("course-materials").upload(path, file, { upsert: false, contentType: file.type || undefined });
       if (uploadError) throw uploadError;
 
-      const { data: pub } = supabase.storage.from("course-materials").getPublicUrl(path);
+      const { data: signed } = await supabase.storage.from("course-materials").createSignedUrl(path, 3600);
       const newMaterial: Material = {
         id: path,
         name: file.name,
         type: detectType(file.name),
-        url: pub.publicUrl,
+        url: signed?.signedUrl || "",
         uploadedBy: isInstructor ? "Instructor" : "You",
         uploadedAt: new Date().toISOString().split("T")[0]
       };
