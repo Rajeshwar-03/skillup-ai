@@ -134,6 +134,7 @@ const ProfilePage = () => {
       </Button>
 
       <main className="container mx-auto px-4 pt-24">
+        <h1 className="sr-only">Your Learning Profile</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <Card className="lg:col-span-3 glass">
             <CardHeader className="flex flex-row items-center justify-between">

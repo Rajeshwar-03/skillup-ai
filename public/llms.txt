@@ -1,0 +1,8 @@
+# SkillUp AI
+
+> AI-powered learning platform with hands-on courses, quizzes, assessments, and personalized study plans across development, design, AI, cloud, and more.
+
+## Pages
+
+- [Home](/): Overview of SkillUp AI, featured courses, and learning paths.
+- [Sign Up / Log In](/signup): Create an account or sign in to enroll in courses.

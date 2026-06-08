@@ -116,9 +116,9 @@ const Auth = () => {
         className="w-full max-w-md"
       >
         <div className="glass rounded-2xl p-8">
-          <h2 className="text-3xl font-bold text-center mb-8 gradient-text">
-            {isLogin ? "Welcome Back" : "Join SkillUp AI"}
-          </h2>
+          <h1 className="text-3xl font-bold text-center mb-8 gradient-text">
+            {isLogin ? "Welcome Back to SkillUp AI" : "Sign Up for SkillUp AI"}
+          </h1>
           <form onSubmit={handleAuth} className="space-y-6">
             <div className="space-y-4">
               {!isLogin && (
