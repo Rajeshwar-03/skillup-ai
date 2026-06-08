@@ -76,7 +76,7 @@ export const AIChat = () => {
         <SheetHeader className="border-b p-4 text-left">
           <div className="flex items-center justify-between">
             <SheetTitle>AI Learning Assistant</SheetTitle>
-            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close chat">
               <X className="h-4 w-4" />
             </Button>
           </div>
